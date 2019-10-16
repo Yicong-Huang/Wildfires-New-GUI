@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 4201",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -23,7 +23,8 @@
     "leaflet": "^1.5.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
-    "zone.js": "~0.9.1"
+    "zone.js": "~0.9.1",
+    "highcharts": "latest"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.802.2",
