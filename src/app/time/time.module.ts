@@ -5,9 +5,12 @@ import {TimeBarComponent} from './time-bar/time-bar.component';
 
 @NgModule({
   declarations: [TimeBarComponent],
+  exports: [
+    TimeBarComponent
+  ],
   imports: [
-    CommonModule
-  ]
+    CommonModule,
+  ],
 })
 export class TimeModule {
 }

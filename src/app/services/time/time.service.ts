@@ -12,7 +12,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Tweet} from "../../models/tweet.model";
+import {Tweet} from '../../models/tweet.model';
 
 // import {Observable, Subject, BehaviorSubject} from 'rxjs';
 // import {HttpClient, HttpParams} from '@angular/common/http';

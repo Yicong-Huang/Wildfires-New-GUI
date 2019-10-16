@@ -6,11 +6,10 @@
  * Last modified  : 2019-08-27 15:31:40
  */
 
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import * as $ from 'jquery';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+
 import {MapService} from '../../services/map-service/map.service';
 import {TimeService} from '../../services/time/time.service';
-import {Tweet} from '../../models/tweet.model';
 
 import * as Highcharts from 'highcharts/highstock';
 
@@ -54,24 +53,10 @@ export class TimeBarComponent implements OnInit {
     Object.keys(dateAndCount).forEach(key => {
       chartData.push([new Date(key).getTime(), dateAndCount[key]]);
     });
-    console.log(chartData);
-    // const chartData = [];
-    // const dailyCount = {};
-    // for (const tweet of tweets) {
-    //     const createAt = tweet.create_at.split('T')[0];
-    //     if (dailyCount.hasOwnProperty(createAt)) {
-    //         dailyCount[createAt]++;
-    //     } else {
-    //         dailyCount[createAt] = 1;
-    //     }
-    // }
-    // Object.keys(dailyCount).sort().forEach(key => {
-    //     chartData.push([new Date(key).getTime(), dailyCount[key]]);
-    // });
 
 
     /** Plotting format of time-bar. */
-    const timebar = Highcharts.stockChart('timebar-container', {
+    const timeBar = Highcharts.stockChart('timeBar-container', {
       chart: {
         height: 150,
         backgroundColor: undefined,
@@ -87,7 +72,7 @@ export class TimeBarComponent implements OnInit {
             const [leftBandStart, bandCenter, rightBandEnd, tick] = this.closestTickNearClick(event.xAxis[0]);
             const dateSelectedInYMD = new Date(bandCenter).toISOString().substring(0, 10);
             if (!this.hasPlotBand) {
-              timebar.xAxis[0].addPlotBand({
+              timeBar.xAxis[0].addPlotBand({
                 from: leftBandStart,
                 to: rightBandEnd,
                 color: 'rgba(216,128,64,0.25)',
@@ -102,8 +87,8 @@ export class TimeBarComponent implements OnInit {
               this.hasPlotBand = true;
               this.timeService.setCurrentDate(dateSelectedInYMD);
             } else if (dateSelectedInYMD !== this.timeService.getCurrentDate()) {
-              timebar.xAxis[0].removePlotBand('plotBand');
-              timebar.xAxis[0].addPlotBand({
+              timeBar.xAxis[0].removePlotBand('plotBand');
+              timeBar.xAxis[0].addPlotBand({
                 from: leftBandStart,
                 to: rightBandEnd,
                 color: 'rgba(216,128,64,0.25)',
@@ -122,7 +107,7 @@ export class TimeBarComponent implements OnInit {
               this.currentTick = tick;
               this.timeService.setCurrentDate(dateSelectedInYMD);
             } else {
-              timebar.xAxis[0].removePlotBand('plotBand');
+              timeBar.xAxis[0].removePlotBand('plotBand');
               if (this.currentTick !== undefined && this.currentTick.hasOwnProperty('label')) {
                 this.currentTick.label.css({
                   color: '#666666'
@@ -142,7 +127,7 @@ export class TimeBarComponent implements OnInit {
       title: {
         text: '',
       },
-      bar: [{
+      series: [{
         type: 'line',
         data: chartData,
         color: '#e25822',
@@ -172,11 +157,9 @@ export class TimeBarComponent implements OnInit {
             console.log(event.min);
             console.log(event.max);
             this.timeService.setRangeDate(event.min, event.max);
-
-            $('#report').html('Date Range => ' +
-              'Start: ' + Highcharts.dateFormat('%Y-%m-%d', event.min) +
-              ', End: ' + Highcharts.dateFormat('%Y-%m-%d', event.max));
-            $(window).trigger('timeRangeChange');
+            this.start = Highcharts.dateFormat('%Y-%m-%d', event.min);
+            this.end = Highcharts.dateFormat('%Y-%m-%d', event.max);
+            this.timeRangeChange.emit();
           }
         }
       },
@@ -184,7 +167,7 @@ export class TimeBarComponent implements OnInit {
         height: 0,
       },
     });
-  }
+  };
 
   /**
    *  Summary: Generate information needed for click event.
@@ -240,8 +223,7 @@ export class TimeBarComponent implements OnInit {
     // this.timeService.getTweetByDate(minValue, (2 * distanceToTheRight) + minValue);
     this.start = Highcharts.dateFormat('%Y-%m-%d', minValue);
     this.end = Highcharts.dateFormat('%Y-%m-%d', 2 * distanceToTheRight + minValue);
-
-    $(window).trigger('timeRangeChange');
+    this.timeRangeChange.emit();
     return [minValue - distanceToTheLeft, minValue, distanceToTheRight + minValue, xAxis.ticks[minValue]];
   }
 }

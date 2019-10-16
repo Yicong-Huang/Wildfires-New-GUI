@@ -5,7 +5,8 @@ import {AppComponent} from './app.component';
 
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {MapModule} from './map/map.module';
-import {TimeModule} from "./time/time.module";
+import {TimeModule} from './time/time.module';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -14,10 +15,11 @@ import {TimeModule} from "./time/time.module";
   imports: [
     MapModule,
     TimeModule,
+    HttpClientModule,
     BrowserModule,
     LeafletModule.forRoot()
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
