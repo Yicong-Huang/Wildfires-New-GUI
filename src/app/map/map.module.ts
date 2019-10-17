@@ -4,6 +4,7 @@ import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {CoreMapComponent} from './core-map/core-map.component';
 
 import {ClickMarkerComponent} from './click-marker/click-marker.component';
+import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
 
 
 @NgModule({
@@ -11,6 +12,7 @@ import {ClickMarkerComponent} from './click-marker/click-marker.component';
   imports: [
     CommonModule,
     LeafletModule,
+    LeafletDrawModule
   ],
   exports: [CoreMapComponent]
 })

@@ -20,11 +20,16 @@
     "@angular/platform-browser-dynamic": "~8.2.0",
     "@angular/router": "~8.2.0",
     "@asymmetrik/ngx-leaflet": "^6.0.1",
+    "@asymmetrik/ngx-leaflet-draw": "^5.0.1",
+    "@asymmetrik/ngx-leaflet-markercluster": "^3.0.0",
+    "@types/leaflet.markercluster": "^1.4.0",
+    "highcharts": "latest",
     "leaflet": "^1.5.1",
+    "leaflet-draw": "^1.0.4",
+    "leaflet.markercluster": "^1.4.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
-    "zone.js": "~0.9.1",
-    "highcharts": "latest"
+    "zone.js": "~0.9.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.802.2",
@@ -33,7 +38,8 @@
     "@angular/language-service": "~8.2.0",
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
-    "@types/leaflet": "^1.5.1",
+    "@types/leaflet": "^1.5.3",
+    "@types/leaflet-draw": "^1.0.1",
     "@types/node": "~8.9.4",
     "codelyzer": "^5.0.0",
     "jasmine-core": "~3.4.0",

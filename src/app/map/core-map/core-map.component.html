@@ -1,13 +1,14 @@
 <!-- Map -->
 <div class="col-sm-12 col-md-6 col-lg-8">
 
-  <div (leafletCenterChange)="onCenterChange($event)" (leafletZoomChange)="onZoomChange($event)"
+  <div leaflet leafletDraw style="height: 800px"
+       (leafletCenterChange)="onCenterChange($event)" (leafletZoomChange)="onZoomChange($event)"
        [leafletCenter]="center"
        [leafletLayersControl]="layersControl"
        [leafletOptions]="options"
        [leafletZoom]="zoom"
-       leaflet
-       style="height: 800px">
+       [leafletLayers]="circles"
+       [leafletDrawOptions]="drawOptions">
   </div>
 
 </div>
