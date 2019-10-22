@@ -5,6 +5,7 @@ import {CoreMapComponent} from './core-map/core-map.component';
 
 import {ClickMarkerComponent} from './click-marker/click-marker.component';
 import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
+import {MyCircleLayer} from "./layer/my.circle.layer";
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
     LeafletModule,
     LeafletDrawModule
   ],
-  exports: [CoreMapComponent]
+  exports: [CoreMapComponent],
+  providers: [MyCircleLayer]
 })
 export class MapModule {
 }

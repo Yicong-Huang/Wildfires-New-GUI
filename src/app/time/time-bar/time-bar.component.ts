@@ -116,6 +116,7 @@ export class TimeBarComponent implements OnInit {
               this.currentTick = undefined;
               this.hasPlotBand = false;
               this.timeService.setCurrentDate(undefined);
+              this.timeService.sendTimeRange();
             }
           },
         }

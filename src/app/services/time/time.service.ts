@@ -8,7 +8,7 @@
  * Last modified  : 2019-08-27 15:31:40
  */
 
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
@@ -18,7 +18,7 @@ import {Tweet} from '../../models/tweet.model';
 // import {HttpClient, HttpParams} from '@angular/common/http';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 
 /**
@@ -28,34 +28,39 @@ import {Tweet} from '../../models/tweet.model';
  *
  */
 export class TimeService {
-    private currentDateInYMD = undefined;
-    private rangeStartDateInMS = new Date().getTime() - 6 * 30 * 24 * 3600 * 1000;
-    private rangeEndDateInMS = new Date().getTime();
+  public timeRangeChange = new EventEmitter();
+  private currentDateInYMD = undefined;
+  private rangeStartDateInMS = new Date().getTime() - 6 * 30 * 24 * 3600 * 1000;
+  private rangeEndDateInMS = new Date().getTime();
 
-    constructor(private http: HttpClient) {
+  constructor(private http: HttpClient) {
 
-    }
+  }
 
-    setCurrentDate(dateInYMD: string): void {
-        this.currentDateInYMD = dateInYMD;
-    }
+  setCurrentDate(dateInYMD: string): void {
+    this.currentDateInYMD = dateInYMD;
+  }
 
-    setRangeDate(startInMs: number, endInMs: number): void {
-        this.rangeStartDateInMS = startInMs;
-        this.rangeEndDateInMS = endInMs;
-    }
+  setRangeDate(startInMs: number, endInMs: number): void {
+    this.rangeStartDateInMS = startInMs;
+    this.rangeEndDateInMS = endInMs;
+  }
 
-    getCurrentDate(): string {
-        return this.currentDateInYMD !== undefined ? this.currentDateInYMD : new Date().toISOString().substring(0, 10);
-    }
+  getCurrentDate(): string {
+    return this.currentDateInYMD !== undefined ? this.currentDateInYMD : new Date().toISOString().substring(0, 10);
+  }
 
-    getRangeDate(): [number, number] {
-        return [this.rangeStartDateInMS, this.rangeEndDateInMS];
-    }
+  getRangeDate(): [number, number] {
+    return [this.rangeStartDateInMS, this.rangeEndDateInMS];
+  }
 
-    getTweetByDate(startDate, endDate): Observable<Tweet[]> {
-        return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/tweet-by-date`,
-            {params: new HttpParams().set('start-date', startDate).set('end-date', endDate)});
-    }
+  getTweetByDate(startDate, endDate): Observable<Tweet[]> {
+    return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/tweet-by-date`,
+      {params: new HttpParams().set('start-date', startDate).set('end-date', endDate)});
+  }
+
+  sendTimeRange() {
+    this.timeRangeChange.next({start: this.rangeStartDateInMS, end: this.rangeEndDateInMS});
+  }
 }
 
