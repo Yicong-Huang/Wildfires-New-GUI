@@ -1,21 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {
-  circle,
-  latLng,
-  LatLng,
-  polygon,
-  tileLayer,
-  layerGroup,
-  marker,
-  Marker,
-  canvas,
-  MarkerClusterGroup,
-  MarkerClusterGroupOptions,
-  icon,
-  MarkerCluster,
-  Browser, Circle, Canvas, LayerGroup
-} from 'leaflet';
+import {canvas, Canvas, latLng, LatLng, LayerGroup, Map, Marker, polygon, tileLayer} from 'leaflet';
 import 'leaflet.markercluster';
+// import {FireRegionLayer} from '../layer/fire.region.layer';
+import {MyCircleLayer} from '../layer/my.circle.layer';
 
 
 @Component({
@@ -24,6 +11,7 @@ import 'leaflet.markercluster';
   styleUrls: ['./core-map.component.css']
 })
 export class CoreMapComponent implements OnInit {
+  map: Map;
   optionsSpec: any = {
     baseUrl: 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
       'Y4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw',
@@ -52,14 +40,13 @@ export class CoreMapComponent implements OnInit {
     layers: this.optionsSpec.layers,
     zoom: this.optionsSpec.zoom,
     center: latLng(this.optionsSpec.center),
-    renderer: canvas({padding: 0.5})
+    renderer: canvas({padding: 0.1})
   };
-
   private points: LayerGroup;
-  canvas: Canvas = canvas({padding: 0.5});
+  canvas: Canvas = canvas({padding: 0.1});
   // Form bindings
   formZoom = this.zoom;
-  zoomLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+
   lat = this.center.lat;
   lng = this.center.lng;
   circles: L.Layer[];
@@ -111,21 +98,19 @@ export class CoreMapComponent implements OnInit {
   };
 
 
-  constructor() {
-  }
-
   ngOnInit() {
-    this.circles = [];
-    for (let i = 0; i < 10; i++) {
-      this.circles.push(circle([this.generateLon(), this.generateLat()], {
-        radius: 100,
-        renderer: this.canvas,
-        color: 'red'
-      }));
-    }
-
-
+    console.log(this.map);
+    // this.circles = [];
+    // for (let i = 0; i < 10; i++) {
+    //   this.circles.push(circle([this.generateLon(), this.generateLat()], {
+    //     radius: 100,
+    //     renderer: this.canvas,
+    //     color: 'red'
+    //   }));
+    // }
+    this.layersControl.overlays['My Circle'] = new MyCircleLayer();
   }
+
 
   // Output binding for center
   onCenterChange(center: LatLng) {

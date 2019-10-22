@@ -10,98 +10,98 @@ import {SearchSuggestion} from '../../models/search.suggestion.model';
 import {environment} from '../../../environments/environment';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class MapService {
 
-    // Declare data events for components to action
-    temperatureChangeEvent = new EventEmitter();
-    searchMarkerLoaded = new EventEmitter();
-    hoverMarkerLoaded = new EventEmitter();
-    markerRemove = new EventEmitter();
-    searchNameLoaded = new EventEmitter();
-    sendFireToFront = new EventEmitter();
+  // Declare data events for components to action
+  temperatureChangeEvent = new EventEmitter();
+  searchMarkerLoaded = new EventEmitter();
+  hoverMarkerLoaded = new EventEmitter();
+  markerRemove = new EventEmitter();
+  searchNameLoaded = new EventEmitter();
+  sendFireToFront = new EventEmitter();
 
-    constructor(private http: HttpClient) {
-    }
-
-
-    getFireTweetData(): Observable<Tweet[]> {
-        return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/fire-tweet`);
-    }
-
-     getDateCountData(): Observable<Tweet[]> {
-        return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/tweet-count`);
-    }
+  constructor(private http: HttpClient) {
+  }
 
 
-    getWildfirePredictionData(northEastBoundaries, southWestBoundaries, start, end): Observable<any> {
-        return this.http.post(`http://${environment.host}:${environment.port}/wildfire-prediction`, JSON.stringify({
-            northEast: northEastBoundaries,
-            southWest: southWestBoundaries,
-            startDate: start,
-            endDate: end,
-        }));
-    }
+  getFireTweetData(): Observable<Tweet[]> {
+    return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/fire-tweet`);
+  }
 
-    getFirePolygonData(northEastBoundaries, southWestBoundaries, setSize, start, end): Observable<any> {
-
-        return this.http.post(`http://${environment.host}:${environment.port}/data/fire-polygon`, JSON.stringify({
-            northEast: northEastBoundaries,
-            southWest: southWestBoundaries,
-            size: setSize,
-            startDate: start,
-            endDate: end,
-        })).pipe(map(data => {
-
-            return {type: 'FeatureCollection', features: data};
-        }));
-    }
+  getDateCountData(): Observable<Tweet[]> {
+    return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/tweet-count`);
+  }
 
 
-    getWindData(): Observable<Wind[]> {
-        return this.http.get<Wind[]>(`http://${environment.host}:${environment.port}/data/wind`);
-    }
+  getWildfirePredictionData(northEastBoundaries, southWestBoundaries, start, end): Observable<any> {
+    return this.http.post(`http://${environment.host}:${environment.port}/wildfire-prediction`, JSON.stringify({
+      northEast: northEastBoundaries,
+      southWest: southWestBoundaries,
+      startDate: start,
+      endDate: end,
+    }));
+  }
 
-    getBoundaryData(stateLevel, countyLevel, cityLevel, northEastBoundaries, southWestBoundaries): Observable<Boundary> {
+  getFirePolygonData(northEastBoundaries, southWestBoundaries, setSize, start, end): Observable<any> {
 
-        return this.http.post<object>(`http://${environment.host}:${environment.port}/search/boundaries`, JSON.stringify({
-            states: stateLevel,
-            cities: cityLevel,
-            counties: countyLevel,
-            northEast: northEastBoundaries,
-            southWest: southWestBoundaries,
-        })).pipe(map(data => {
+    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-polygon`, JSON.stringify({
+      northEast: northEastBoundaries,
+      southWest: southWestBoundaries,
+      size: setSize,
+      startDate: start,
+      endDate: end,
+    })).pipe(map(data => {
 
-            return {type: 'FeatureCollection', features: data};
-        }));
-    }
-
-    getDropBox(userInput): Observable<SearchSuggestion[]> {
-        // gets auto-completion suggestions
-        return this.http.get<SearchSuggestion[]>(`http://${environment.host}:${environment.port}/dropdownMenu`,
-            {params: new HttpParams().set('userInput', userInput)});
-    }
+      return {type: 'FeatureCollection', features: data};
+    }));
+  }
 
 
-    getRecentTweetData(): Observable<any> {
+  getWindData(): Observable<Wind[]> {
+    return this.http.get<Wind[]>(`http://${environment.host}:${environment.port}/data/wind`);
+  }
 
-        return this.http.get(`http://${environment.host}:${environment.port}/tweet/recent-tweet`);
-    }
+  getBoundaryData(stateLevel, countyLevel, cityLevel, northEastBoundaries, southWestBoundaries): Observable<Boundary> {
 
-    getTemperatureData(): Observable<HeatMap[]> {
-        return this.http.get<HeatMap[]>(`http://${environment.host}:${environment.port}/data/recent-temp`);
-    }
+    return this.http.post<object>(`http://${environment.host}:${environment.port}/search/boundaries`, JSON.stringify({
+      states: stateLevel,
+      cities: cityLevel,
+      counties: countyLevel,
+      northEast: northEastBoundaries,
+      southWest: southWestBoundaries,
+    })).pipe(map(data => {
 
-    getClickData(lat, lng, radius, timestamp, range): Observable<any> {
+      return {type: 'FeatureCollection', features: data};
+    }));
+  }
 
-        return this.http.post(`http://${environment.host}:${environment.port}/data/aggregation`, JSON.stringify({
-            lat, lng, radius, timestamp, range
-        }));
-    }
+  getDropBox(userInput): Observable<SearchSuggestion[]> {
+    // gets auto-completion suggestions
+    return this.http.get<SearchSuggestion[]>(`http://${environment.host}:${environment.port}/dropdownMenu`,
+      {params: new HttpParams().set('userInput', userInput)});
+  }
 
-    getIntentTweetData(id): Observable<any> {
-        return this.http.get(`http://${environment.host}:${environment.port}/tweet/tweet-from-id`,
-            {params: new HttpParams().set('tweet_id', id)});
-    }
+
+  getRecentTweetData(): Observable<any> {
+
+    return this.http.get(`http://${environment.host}:${environment.port}/tweet/recent-tweet`);
+  }
+
+  getTemperatureData(): Observable<HeatMap[]> {
+    return this.http.get<HeatMap[]>(`http://${environment.host}:${environment.port}/data/recent-temp`);
+  }
+
+  getClickData(lat, lng, radius, timestamp, range): Observable<any> {
+
+    return this.http.post(`http://${environment.host}:${environment.port}/data/aggregation`, JSON.stringify({
+      lat, lng, radius, timestamp, range
+    }));
+  }
+
+  getIntentTweetData(id): Observable<any> {
+    return this.http.get(`http://${environment.host}:${environment.port}/tweet/tweet-from-id`,
+      {params: new HttpParams().set('tweet_id', id)});
+  }
 }
