@@ -14,9 +14,6 @@ import {environment} from '../../../environments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Tweet} from '../../models/tweet.model';
 
-// import {Observable, Subject, BehaviorSubject} from 'rxjs';
-// import {HttpClient, HttpParams} from '@angular/common/http';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -60,6 +57,7 @@ export class TimeService {
   }
 
   sendTimeRange() {
+    console.log('sending time');
     this.timeRangeChange.next({start: this.rangeStartDateInMS, end: this.rangeEndDateInMS});
   }
 }
