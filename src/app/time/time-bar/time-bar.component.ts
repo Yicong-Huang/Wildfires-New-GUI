@@ -22,9 +22,9 @@ export class TimeBarComponent implements OnInit {
   @Input() start: string;
   @Input() end: string;
   @Output() timeRangeChange = new EventEmitter();
-  private halfUnit = 86400000 / 2;
   private currentTick = undefined;
   private hasPlotBand = false;
+  private timeBar = undefined;
 
   constructor(private mapService: MapService, private timeService: TimeService) {
   }
@@ -62,63 +62,7 @@ export class TimeBarComponent implements OnInit {
         backgroundColor: undefined,
         zoomType: 'x',
         events: {
-          /**
-           *  Tow things to check on a click event:
-           *  1. Plot band: transparent orange box drew on time-bar.
-           *  2. Ticks (x-axis label): color the x-axis if it is labeled.
-           */
-          click: event => {
-            // @ts-ignore
-            const [leftBandStart, bandCenter, rightBandEnd, tick] = this.closestTickNearClick(event.xAxis[0]);
-            const dateSelectedInYMD = new Date(bandCenter).toISOString().substring(0, 10);
-            if (!this.hasPlotBand) {
-              timeBar.xAxis[0].addPlotBand({
-                from: leftBandStart,
-                to: rightBandEnd,
-                color: 'rgba(216,128,64,0.25)',
-                id: 'plotBand',
-              });
-              if (tick !== undefined) {
-                tick.label.css({
-                  color: '#ffffff'
-                });
-              }
-              this.currentTick = tick;
-              this.hasPlotBand = true;
-              this.timeService.setCurrentDate(dateSelectedInYMD);
-            } else if (dateSelectedInYMD !== this.timeService.getCurrentDate()) {
-              timeBar.xAxis[0].removePlotBand('plotBand');
-              timeBar.xAxis[0].addPlotBand({
-                from: leftBandStart,
-                to: rightBandEnd,
-                color: 'rgba(216,128,64,0.25)',
-                id: 'plotBand'
-              });
-              if (this.currentTick !== undefined && this.currentTick.hasOwnProperty('label')) {
-                this.currentTick.label.css({
-                  color: '#666666'
-                });
-              }
-              if (tick !== undefined) {
-                tick.label.css({
-                  color: '#ffffff'
-                });
-              }
-              this.currentTick = tick;
-              this.timeService.setCurrentDate(dateSelectedInYMD);
-            } else {
-              timeBar.xAxis[0].removePlotBand('plotBand');
-              if (this.currentTick !== undefined && this.currentTick.hasOwnProperty('label')) {
-                this.currentTick.label.css({
-                  color: '#666666'
-                });
-              }
-              this.currentTick = undefined;
-              this.hasPlotBand = false;
-              this.timeService.setCurrentDate(undefined);
-              this.timeService.sendTimeRange();
-            }
-          },
+          click: this.clickHandler
         }
       },
       navigator: {
@@ -132,7 +76,6 @@ export class TimeBarComponent implements OnInit {
         type: 'line',
         data: chartData,
         color: '#e25822',
-        name: '<span style=\'color:#e25822\'>Wildfire Tweet</span>',
       }],
       tooltip: {
         enabled: true,
@@ -150,24 +93,91 @@ export class TimeBarComponent implements OnInit {
         type: 'datetime',
         range: 6 * 30 * 24 * 3600 * 1000, // six months
         events: {
-          /**
-           *  This event allow both selections on time-bar and navigator,
-           *  updating information of date.
-           */
-          setExtremes: (event) => {
-            console.log(event.min);
-            console.log(event.max);
-            this.timeService.setRangeDate(event.min, event.max);
-            this.start = Highcharts.dateFormat('%Y-%m-%d', event.min);
-            this.end = Highcharts.dateFormat('%Y-%m-%d', event.max);
-            this.timeRangeChange.emit();
-          }
+          setExtremes: this.setExtremeHandler
         }
       },
       scrollbar: {
         height: 0,
       },
     });
+    this.timeBar = timeBar;
+  };
+
+  /**
+   * Perform actions related to clicking event of time bar
+   * And inform other components about this event
+   *
+   *  Tow things to check on a click event:
+   *  1. Plot band: transparent orange box drew on time-bar.
+   *  2. Ticks (x-axis label): color the x-axis if it is labeled.
+   *
+   * @param event event data triggered by the clicking event
+   *
+   */
+  clickHandler = (event) => {
+      // @ts-ignore
+      const [leftBandStart, bandCenter, rightBandEnd, tick] = this.closestTickNearClick(event.xAxis[0]);
+      const dateSelectedInYMD = new Date(bandCenter).toISOString().substring(0, 10);
+      const plotBandOption = {
+        from: leftBandStart,
+        to: rightBandEnd,
+        color: 'rgba(216,128,64)',
+        id: 'plotBand'
+      };
+
+      if (!this.hasPlotBand) {
+        this.timeBar.xAxis[0].addPlotBand(plotBandOption);
+        if (tick !== undefined) {
+          tick.label.css({
+            color: '#ffffff'
+          });
+        }
+        this.currentTick = tick;
+        this.hasPlotBand = true;
+        this.timeService.setCurrentDate(dateSelectedInYMD);
+      } else if (dateSelectedInYMD !== this.timeService.getCurrentDate()) {
+        this.timeBar.xAxis[0].removePlotBand('plotBand');
+        this.timeBar.xAxis[0].addPlotBand(plotBandOption);
+        if (this.currentTick !== undefined && this.currentTick.hasOwnProperty('label')) {
+          this.currentTick.label.css({
+            color: '#666666'
+          });
+        }
+        if (tick !== undefined) {
+          tick.label.css({
+            color: '#ffffff'
+          });
+        }
+        this.currentTick = tick;
+        this.timeService.setCurrentDate(dateSelectedInYMD);
+      } else {
+        this.timeBar.xAxis[0].removePlotBand('plotBand');
+        if (this.currentTick !== undefined && this.currentTick.hasOwnProperty('label')) {
+          this.currentTick.label.css({
+            color: '#666666'
+          });
+        }
+        this.currentTick = undefined;
+        this.hasPlotBand = false;
+        this.timeService.setCurrentDate(undefined);
+        this.timeService.sendTimeRange();
+      }
+
+  };
+
+  /**
+   *  This event allow both selections on time-bar and navigator,
+   *  updating information of date.
+   *
+   *
+   *  @param event event data triggered by the set range event of lower time bar
+   *
+   */
+  setExtremeHandler = (event) => {
+    this.timeService.setRangeDate(event.min, event.max);
+    this.start = Highcharts.dateFormat('%Y-%m-%d', event.min);
+    this.end = Highcharts.dateFormat('%Y-%m-%d', event.max);
+    this.timeRangeChange.emit();
   };
 
   /**
@@ -182,8 +192,8 @@ export class TimeBarComponent implements OnInit {
    */
   closestTickNearClick(eventAxis): [number, number, number, any] {
 
-    const halfUnitDistance = 43200000;
     const xAxis = eventAxis.axis;
+    const halfUnitDistance = xAxis.closestPointRange / 2;
     const dateClickedInMs = eventAxis.value;
     let distanceToTheLeft;
     let distanceToTheRight;
@@ -212,16 +222,8 @@ export class TimeBarComponent implements OnInit {
         distanceToTheRight = (xAxis.ordinalPositions[minKey + 1] - xAxis.ordinalPositions[minKey]) / 2;
       }
     }
-    console.log(minValue - distanceToTheLeft);
-    console.log(minValue);
-    console.log(distanceToTheRight + minValue);
-    // this.timeService.setRangeDate(minValue - distanceToTheLeft, distanceToTheRight + minValue);
-    // $('#report').html('Date Range => ' +
-    //     'Start: ' + Highcharts.dateFormat('%Y-%m-%d', minValue - distanceToTheLeft) +
-    //     ', End: ' + Highcharts.dateFormat('%Y-%m-%d', distanceToTheRight + minValue));
-    // $(window).trigger('timeRangeChange');
+
     this.timeService.setRangeDate(minValue, (2 * distanceToTheRight) + minValue);
-    // this.timeService.getTweetByDate(minValue, (2 * distanceToTheRight) + minValue);
     this.start = Highcharts.dateFormat('%Y-%m-%d', minValue);
     this.end = Highcharts.dateFormat('%Y-%m-%d', 2 * distanceToTheRight + minValue);
     this.timeRangeChange.emit();
