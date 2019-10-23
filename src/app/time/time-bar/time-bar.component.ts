@@ -6,7 +6,7 @@
  * Last modified  : 2019-08-27 15:31:40
  */
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
 import {MapService} from '../../services/map-service/map.service';
 import {TimeService} from '../../services/time/time.service';
@@ -21,7 +21,7 @@ import * as Highcharts from 'highcharts/highstock';
 export class TimeBarComponent implements OnInit {
   @Input() start: string;
   @Input() end: string;
-  @Output() timeRangeChange = new EventEmitter();
+  // @Output() timeRangeChange = new EventEmitter();
   private halfUnit = 86400000 / 2;
   private currentTick = undefined;
   private hasPlotBand = false;
@@ -155,12 +155,13 @@ export class TimeBarComponent implements OnInit {
            *  updating information of date.
            */
           setExtremes: (event) => {
-            console.log(event.min);
-            console.log(event.max);
+            // console.log(event.min);
+            // console.log(event.max);
             this.timeService.setRangeDate(event.min, event.max);
             this.start = Highcharts.dateFormat('%Y-%m-%d', event.min);
             this.end = Highcharts.dateFormat('%Y-%m-%d', event.max);
-            this.timeRangeChange.emit();
+            // this.timeRangeChange.emit();
+            this.timeService.sendTimeRange();
           }
         }
       },
@@ -224,7 +225,7 @@ export class TimeBarComponent implements OnInit {
     // this.timeService.getTweetByDate(minValue, (2 * distanceToTheRight) + minValue);
     this.start = Highcharts.dateFormat('%Y-%m-%d', minValue);
     this.end = Highcharts.dateFormat('%Y-%m-%d', 2 * distanceToTheRight + minValue);
-    this.timeRangeChange.emit();
+    // this.timeRangeChange.emit();
     return [minValue - distanceToTheLeft, minValue, distanceToTheRight + minValue, xAxis.ticks[minValue]];
   }
 }

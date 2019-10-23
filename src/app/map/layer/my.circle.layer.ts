@@ -1,6 +1,7 @@
-import {geoJSON, GeoJSON, Layer, LayerGroup, LayerOptions, Map} from 'leaflet';
+import {geoJSON, GeoJSON, Layer, LayerGroup, Map} from 'leaflet';
 import {TimeService} from '../../services/time/time.service';
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
+import {LeafletDirective} from '@asymmetrik/ngx-leaflet';
 
 @Injectable()
 export class MyCircleLayer extends LayerGroup {
@@ -8,9 +9,13 @@ export class MyCircleLayer extends LayerGroup {
   private targetC: Layer[];
   private dateStartInISO;
   private dateEndInISO;
+  private map;
 
-  constructor(private timeService: TimeService, layers?: Layer[], options?: LayerOptions) {
-    super(layers, options);
+
+  constructor(private timeService: TimeService, @Inject(LeafletDirective) private leafletDirective: LeafletDirective) {
+
+    super();
+    console.log(leafletDirective);
     this.timeService.timeRangeChange.subscribe(this.timeRangeChangeFirePolygonHandler);
   }
 
@@ -47,7 +52,15 @@ export class MyCircleLayer extends LayerGroup {
     this.dateEndInISO = new Date(end).toISOString();
     console.log(this.dateEndInISO);
     console.log(this.dateEndInISO);
+    const polygonId = this.getLayerId(this.target);
+    let data: Layer = this.getLayer(polygonId);
+    data = geoJSON(({
+      type: 'Polygon',
+      coordinates: [[[-123, 43.87], [-120.5, 46.87], [-113.5, 46.93], [-121.6, 46.87]]]
+    }) as any, {style: () => ({color: 'red'})}).addTo(this.map);
+    this.on()
   };
+
 
   /*    getFirePolygon = (start, end) => {
           // sends request to the map service based on the start/end time and the current screen map boundaries
@@ -74,3 +87,4 @@ export class MyCircleLayer extends LayerGroup {
     return Math.random() * 180 - 90;
   }
 }
+

@@ -3,7 +3,7 @@ import {canvas, Canvas, latLng, LatLng, LayerGroup, Map, Marker, polygon, tileLa
 import 'leaflet.markercluster';
 // import {FireRegionLayer} from '../layer/fire.region.layer';
 import {MyCircleLayer} from '../layer/my.circle.layer';
-
+import {TimeService} from '../../services/time/time.service';
 
 @Component({
   selector: 'app-core-map',
@@ -11,6 +11,8 @@ import {MyCircleLayer} from '../layer/my.circle.layer';
   styleUrls: ['./core-map.component.css']
 })
 export class CoreMapComponent implements OnInit {
+  constructor(private timeService: TimeService) {
+  }
   map: Map;
   optionsSpec: any = {
     baseUrl: 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
@@ -108,7 +110,7 @@ export class CoreMapComponent implements OnInit {
     //     color: 'red'
     //   }));
     // }
-    this.layersControl.overlays['My Circle'] = new MyCircleLayer();
+    this.layersControl.overlays['My Circle'] = new MyCircleLayer(this.timeService);
   }
 
 

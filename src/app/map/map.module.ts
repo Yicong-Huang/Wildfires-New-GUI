@@ -1,11 +1,11 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {LeafletModule} from '@asymmetrik/ngx-leaflet';
+import {LeafletDirective, LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {CoreMapComponent} from './core-map/core-map.component';
 
 import {ClickMarkerComponent} from './click-marker/click-marker.component';
 import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
-import {MyCircleLayer} from "./layer/my.circle.layer";
+import {MyCircleLayer} from './layer/my.circle.layer';
 
 
 @NgModule({
@@ -13,10 +13,11 @@ import {MyCircleLayer} from "./layer/my.circle.layer";
   imports: [
     CommonModule,
     LeafletModule,
-    LeafletDrawModule
+    LeafletDrawModule,
+
   ],
   exports: [CoreMapComponent],
-  providers: [MyCircleLayer]
+  providers: [MyCircleLayer, LeafletDirective]
 })
 export class MapModule {
 }

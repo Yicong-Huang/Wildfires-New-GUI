@@ -21,7 +21,7 @@ import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
     LeafletModule.forRoot(),
     LeafletDrawModule.forRoot(),
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {
 }
