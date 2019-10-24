@@ -22,6 +22,7 @@
     "@asymmetrik/ngx-leaflet": "^6.0.1",
     "@types/leaflet.markercluster": "^1.4.0",
     "highcharts": "latest",
+    "json2typescript": "^1.2.3",
     "leaflet": "^1.5.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",

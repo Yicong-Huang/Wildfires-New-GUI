@@ -4,6 +4,7 @@ import {FirePolygonLayer} from '../layer/fire-polygon.layer';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {FireTweetLayer} from '../layer/fire-tweet.layer';
+import {TweetService} from '../../../services/tweet/tweet.service';
 
 @Component({
   selector: 'app-core-map',
@@ -11,7 +12,7 @@ import {FireTweetLayer} from '../layer/fire-tweet.layer';
   styleUrls: ['./core-map.component.css']
 })
 export class CoreMapComponent implements OnInit {
-  constructor(private timeService: TimeService, private fireService: FireService) {
+  constructor(private timeService: TimeService, private fireService: FireService, private tweetService: TweetService) {
 
   }
 
@@ -76,7 +77,7 @@ export class CoreMapComponent implements OnInit {
 
   ngOnInit() {
     this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
-    this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer();
+    this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer(this.timeService, this.tweetService);
 
   }
 

@@ -1,4 +1,7 @@
 import {canvas, CircleMarker, circleMarker, LatLng, LayerGroup, Map} from 'leaflet';
+import {TimeService} from '../../../services/time/time.service';
+import {TweetService} from '../../../services/tweet/tweet.service';
+import {Tweet} from '../../../models/tweet.model';
 
 
 export class FireTweetLayer extends LayerGroup {
@@ -8,13 +11,22 @@ export class FireTweetLayer extends LayerGroup {
   private tweetColor = 'red';
   private tweets: CircleMarker[] = [];
 
+  constructor(private timeService: TimeService, private tweetService: TweetService) {
+    super();
+
+  }
+
   onAdd(map: Map): this {
     this.map = map;
+    this.tweetService.getFireTweetData().subscribe(tweets => this.addTweetsToMap(tweets, map));
 
-    for (let i = 0; i < 1000; i++) {
-      this.addOneTweet(map, this.generatingLatLng());
-    }
     return this;
+  }
+
+  addTweetsToMap(tweets: Tweet[], map: Map) {
+    for (const tweet of tweets) {
+      this.addOneTweet(map, tweet.getLatLng());
+    }
   }
 
   addOneTweet(map: Map, latLng: LatLng) {

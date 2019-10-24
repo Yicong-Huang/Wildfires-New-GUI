@@ -12,6 +12,8 @@ import {MapService} from '../../../services/map/map.service';
 import {TimeService} from '../../../services/time/time.service';
 
 import * as HighCharts from 'highcharts/highstock';
+import {TweetService} from '../../../services/tweet/tweet.service';
+import {TweetCount} from '../../../models/tweet-count.model';
 
 @Component({
   selector: 'app-time-bar',
@@ -25,12 +27,13 @@ export class TimeBarComponent implements OnInit {
   private hasPlotBand = false;
   private timeBar = undefined;
 
-  constructor(private mapService: MapService, private timeService: TimeService) {
+  constructor(private mapService: MapService, private timeService: TimeService, private tweetService: TweetService) {
+
   }
 
   ngOnInit() {
     /** Subscribe tweet data related to wildfire in service. */
-    this.mapService.getDateCountData().subscribe(this.drawTimeBar);
+    this.tweetService.getTweetCountByDateData().subscribe(this.drawTimeBar);
   }
 
   /**
@@ -40,7 +43,7 @@ export class TimeBarComponent implements OnInit {
    * Count wildfire related tweets and draw it as a time bar chart to visualize.
    *
    */
-  drawTimeBar = (dateAndCount: [string, number]) => {
+  drawTimeBar = (dateAndCount: TweetCount[]) => {
     /** replace */
     /**
      *  Refine tweet data to count related to 'wildfire' in each DAY,

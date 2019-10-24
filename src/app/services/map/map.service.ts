@@ -2,11 +2,10 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {map} from 'rxjs/operators';
-import {Tweet} from '../../components/models/tweet.model';
-import {Wind} from '../../components/models/wind.model';
-import {HeatMap} from '../../components/models/heat-map.model';
-import {Boundary} from '../../components/models/boundary.model';
-import {SearchSuggestion} from '../../components/models/search-suggestion.model';
+import {Wind} from '../../models/wind.model';
+import {HeatMap} from '../../models/heat-map.model';
+import {Boundary} from '../../models/boundary.model';
+import {SearchSuggestion} from '../../models/search-suggestion.model';
 import {environment} from '../../../environments/environment';
 
 @Injectable({
@@ -25,15 +24,6 @@ export class MapService {
   constructor(private http: HttpClient) {
   }
 
-
-  getFireTweetData(): Observable<Tweet[]> {
-    return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/fire-tweet`);
-  }
-
-  // TODO: add model
-  getDateCountData(): Observable<any> {
-    return this.http.get<any>(`http://${environment.host}:${environment.port}/tweet/tweet-count`);
-  }
 
 
   getWildfirePredictionData(northEastBoundaries, southWestBoundaries, start, end): Observable<any> {
