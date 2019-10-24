@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {LeafletDirective, LeafletModule} from '@asymmetrik/ngx-leaflet';
+import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {CoreMapComponent} from './core-map/core-map.component';
 
 import {ClickMarkerComponent} from './click-marker/click-marker.component';
@@ -17,7 +17,7 @@ import {MyCircleLayer} from './layer/my.circle.layer';
 
   ],
   exports: [CoreMapComponent],
-  providers: [MyCircleLayer, LeafletDirective]
+  providers: [MyCircleLayer]
 })
 export class MapModule {
 }

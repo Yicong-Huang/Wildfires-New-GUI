@@ -68,6 +68,8 @@ export class TimeBarComponent implements OnInit {
            *  2. Ticks (x-axis label): color the x-axis if it is labeled.
            */
           click: event => {
+
+            console.log('in click');
             // @ts-ignore
             const [leftBandStart, bandCenter, rightBandEnd, tick] = this.closestTickNearClick(event.xAxis[0]);
             const dateSelectedInYMD = new Date(bandCenter).toISOString().substring(0, 10);
@@ -155,12 +157,11 @@ export class TimeBarComponent implements OnInit {
            *  updating information of date.
            */
           setExtremes: (event) => {
-            // console.log(event.min);
-            // console.log(event.max);
+
             this.timeService.setRangeDate(event.min, event.max);
             this.start = Highcharts.dateFormat('%Y-%m-%d', event.min);
             this.end = Highcharts.dateFormat('%Y-%m-%d', event.max);
-            // this.timeRangeChange.emit();
+
             this.timeService.sendTimeRange();
           }
         }
@@ -213,9 +214,7 @@ export class TimeBarComponent implements OnInit {
         distanceToTheRight = (xAxis.ordinalPositions[minKey + 1] - xAxis.ordinalPositions[minKey]) / 2;
       }
     }
-    console.log(minValue - distanceToTheLeft);
-    console.log(minValue);
-    console.log(distanceToTheRight + minValue);
+
     // this.timeService.setRangeDate(minValue - distanceToTheLeft, distanceToTheRight + minValue);
     // $('#report').html('Date Range => ' +
     //     'Start: ' + Highcharts.dateFormat('%Y-%m-%d', minValue - distanceToTheLeft) +

@@ -7,8 +7,6 @@
        [leafletLayersControl]="layersControl"
        [leafletOptions]="options"
        [leafletZoom]="zoom"
-       [leafletLayers]="circles"
-       [leafletDrawOptions]="drawOptions">
-  </div>
+       (leafletMapReady)="onMapReady($event)"></div>
 
 </div>
