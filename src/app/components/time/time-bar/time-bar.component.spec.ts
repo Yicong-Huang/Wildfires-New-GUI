@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { TimeBarComponent } from './time-bar.component';
+import {TimeBarComponent} from './time-bar.component';
 
 describe('TimeBarComponent', () => {
   let component: TimeBarComponent;

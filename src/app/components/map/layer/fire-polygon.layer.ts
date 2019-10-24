@@ -1,6 +1,6 @@
 import {GeoJSON, geoJSON, LayerGroup, Map} from 'leaflet';
-import {TimeService} from '../../services/time/time.service';
-import {FireService} from '../../services/fire/fire.service';
+import {TimeService} from '../../../services/time/time.service';
+import {FireService} from '../../../services/fire/fire.service';
 
 
 export class FirePolygonLayer extends LayerGroup {

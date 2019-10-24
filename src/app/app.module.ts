@@ -4,10 +4,9 @@ import {NgModule} from '@angular/core';
 import {AppComponent} from './app.component';
 
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
-import {MapModule} from './map/map.module';
-import {TimeModule} from './time/time.module';
+import {MapModule} from './components/map/map.module';
+import {TimeModule} from './components/time/time.module';
 import {HttpClientModule} from '@angular/common/http';
-import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
 
 @NgModule({
   declarations: [
@@ -19,7 +18,6 @@ import {LeafletDrawModule} from '@asymmetrik/ngx-leaflet-draw';
     HttpClientModule,
     BrowserModule,
     LeafletModule.forRoot(),
-    LeafletDrawModule.forRoot(),
   ],
   bootstrap: [AppComponent],
 })

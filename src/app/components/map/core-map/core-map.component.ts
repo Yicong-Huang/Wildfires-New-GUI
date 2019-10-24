@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {latLng, LatLng, Map, tileLayer} from 'leaflet';
-import 'leaflet.markercluster';
 import {FirePolygonLayer} from '../layer/fire-polygon.layer';
-import {TimeService} from '../../services/time/time.service';
-import {FireService} from '../../services/fire/fire.service';
+import {TimeService} from '../../../services/time/time.service';
+import {FireService} from '../../../services/fire/fire.service';
+import {FireTweetLayer} from '../layer/fire-tweet.layer';
 
 @Component({
   selector: 'app-core-map',
