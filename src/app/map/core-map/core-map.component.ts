@@ -3,6 +3,7 @@ import {latLng, LatLng, Map, tileLayer} from 'leaflet';
 import 'leaflet.markercluster';
 import {FirePolygonLayer} from '../layer/fire-polygon.layer';
 import {TimeService} from '../../services/time/time.service';
+import {FireService} from '../../services/fire/fire.service';
 
 @Component({
   selector: 'app-core-map',
@@ -10,7 +11,8 @@ import {TimeService} from '../../services/time/time.service';
   styleUrls: ['./core-map.component.css']
 })
 export class CoreMapComponent implements OnInit {
-  constructor(private timeService: TimeService) {
+  constructor(private timeService: TimeService, private fireService: FireService) {
+
   }
 
   map: Map;
@@ -73,7 +75,8 @@ export class CoreMapComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService);
+    this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
+
   }
 
 

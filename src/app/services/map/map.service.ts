@@ -45,19 +45,7 @@ export class MapService {
     }));
   }
 
-  getFirePolygonData(northEastBoundaries, southWestBoundaries, setSize, start, end): Observable<any> {
 
-    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-polygon`, JSON.stringify({
-      northEast: northEastBoundaries,
-      southWest: southWestBoundaries,
-      size: setSize,
-      startDate: start,
-      endDate: end,
-    })).pipe(map(data => {
-
-      return {type: 'FeatureCollection', features: data};
-    }));
-  }
 
 
   getWindData(): Observable<Wind[]> {

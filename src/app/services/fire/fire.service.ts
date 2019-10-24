@@ -7,26 +7,40 @@ import {map} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class FireService {
 
-    constructor(private http: HttpClient) {
+  constructor(private http: HttpClient) {
 
-    }
+  }
 
-    searchFirePolygon(id, size): Observable<object> {
-        return this.http.post(`http://${environment.host}:${environment.port}/data/fire-with-id`, JSON.stringify({
-            id,
-            size
-        }));
-    }
+  searchFirePolygon(id, size): Observable<object> {
+    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-with-id`, JSON.stringify({
+      id,
+      size
+    }));
+  }
 
-    searchSeparatedFirePolygon(id, size): Observable<object> {
-        return this.http.post(`http://${environment.host}:${environment.port}/data/fire-with-id-seperated`, JSON.stringify({
-            id, size,
-        })).pipe(map(data => {
-            return {type: 'FeatureCollection', features: data};
-        }));
-    }
+  searchSeparatedFirePolygon(id, size): Observable<object> {
+    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-with-id-seperated`, JSON.stringify({
+      id, size,
+    })).pipe(map(data => {
+      return {type: 'FeatureCollection', features: data};
+    }));
+  }
+
+  getFirePolygonData(northEastBoundaries, southWestBoundaries, setSize, start, end): Observable<any> {
+
+    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-polygon`, JSON.stringify({
+      northEast: northEastBoundaries,
+      southWest: southWestBoundaries,
+      size: setSize,
+      startDate: start,
+      endDate: end,
+    })).pipe(map(data => {
+
+      return {type: 'FeatureCollection', features: data};
+    }));
+  }
 }
