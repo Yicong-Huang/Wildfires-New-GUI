@@ -4,9 +4,9 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {Tweet} from '../../models/tweet.model';
 import {Wind} from '../../models/wind.model';
-import {HeatMap} from '../../models/heatMap.model';
+import {HeatMap} from '../../models/heat-map.model';
 import {Boundary} from '../../models/boundary.model';
-import {SearchSuggestion} from '../../models/search.suggestion.model';
+import {SearchSuggestion} from '../../models/search-suggestion.model';
 import {environment} from '../../../environments/environment';
 
 @Injectable({

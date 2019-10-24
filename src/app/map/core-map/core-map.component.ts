@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {canvas, latLng, LatLng, Map, polygon, tileLayer} from 'leaflet';
+import {latLng, LatLng, Map, tileLayer} from 'leaflet';
 import 'leaflet.markercluster';
-import {MyCircleLayer} from '../layer/my.circle.layer';
+import {FirePolygonLayer} from '../layer/fire-polygon.layer';
 import {TimeService} from '../../services/time/time.service';
 
 @Component({
@@ -41,8 +41,7 @@ export class CoreMapComponent implements OnInit {
   options = {
     layers: this.optionsSpec.layers,
     zoom: this.optionsSpec.zoom,
-    center: latLng(this.optionsSpec.center),
-    renderer: canvas({padding: 0.1})
+    center: latLng(this.optionsSpec.center)
   };
   // Form bindings
   formZoom = this.zoom;
@@ -70,15 +69,11 @@ export class CoreMapComponent implements OnInit {
         attribution: 'Satellite'
       })
     },
-    overlays: {
-      // 'Big Circle': this.points,
-      'Big Square': polygon([[46.8, -121.55], [46.9, -121.55], [46.9, -121.7], [46.8, -121.7]]),
-      // 'marker Cluster Group':
-    }
+    overlays: {}
   };
 
   ngOnInit() {
-    this.layersControl.overlays['My Circle'] = new MyCircleLayer(this.timeService);
+    this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService);
   }
 
 
@@ -98,8 +93,6 @@ export class CoreMapComponent implements OnInit {
 
   onMapReady(map: Map) {
     this.map = map;
-    console.log('this is map');
-    console.log(map);
   }
 
 

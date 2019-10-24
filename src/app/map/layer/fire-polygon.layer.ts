@@ -2,7 +2,7 @@ import {geoJSON, GeoJSON, LayerGroup, Map} from 'leaflet';
 import {TimeService} from '../../services/time/time.service';
 
 
-export class MyCircleLayer extends LayerGroup {
+export class FirePolygonLayer extends LayerGroup {
   private target: GeoJSON<any>;
 
   private dateStartInISO;

@@ -8,7 +8,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 
-import {MapService} from '../../services/map-service/map.service';
+import {MapService} from '../../services/map/map.service';
 import {TimeService} from '../../services/time/time.service';
 
 import * as HighCharts from 'highcharts/highstock';
