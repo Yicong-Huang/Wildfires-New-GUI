@@ -39,13 +39,13 @@ export class FirePolygonLayer extends LayerGroup {
     const dateEndInISO = new Date(end).toISOString();
     this.fireService.getFirePolygonData(boundNE, boundSW, size, dateStartInISO, dateEndInISO).subscribe(this.firePolygonDataHandler);
 
-    return undefined;
+    return this;
   }
 
   onRemove(map: Map): this {
     console.log('on remove');
 
-    return undefined;
+    return this;
   }
 
   firePolygonDataHandler = (data) => {
@@ -118,10 +118,6 @@ export class FirePolygonLayer extends LayerGroup {
     // processes given time data from time-series
     this.dateStartInISO = new Date(start).toISOString();
     this.dateEndInISO = new Date(end).toISOString();
-    console.log(this.dateEndInISO);
-    console.log(this.dateEndInISO);
-
-    console.log('in updating');
 
   };
 
