@@ -1,4 +1,4 @@
-import {GeoJSON, geoJSON, icon, LayerGroup, Map} from 'leaflet';
+import {GeoJSON, geoJSON, icon, latLng, LayerGroup, Map, marker, Marker} from 'leaflet';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 
@@ -11,38 +11,17 @@ export class FirePolygonLayer extends LayerGroup {
 
   private polygons: GeoJSON[];
   private polygon: GeoJSON;
+  private markers: Marker[] = [];
   private firePolygon;
   private startDate;
   private endDate;
   private map;
   private fireObjectInfo;
 
-  private static formatPopUpContent(fireObject) {
-    return '\n <div class="fire">\n '
-      + '      <span class="name" style=\'color: #ff8420;\'> '
-      + 'Fire Name: ' + fireObject.properties.name
-      + '      </span><br> '
-      + '      <span class="fire-starttime" style=\'color: #ff8420;\'>'
-      + 'Fire Start Time: ' + fireObject.properties.starttime
-      + '      </span><br>\n	 '
-      + '      <span class="fire-endtime" style=\'color: #ff8420;\'>'
-      + 'Fire End Time: ' + fireObject.properties.endtime
-      + '      </span><br>\n	 '
-      + '      <span class="fire-area" style=\'color: #ff8420;\'>'
-      + 'Fire Area: ' + fireObject.properties.area + ' acres'
-      + '      </span><br>\n	 '
-      + '<span class="fire-agency" style=\'color: #ff8420;\'>'
-      + 'Fire Agency: ' + fireObject.properties.agency
-      + '      </span><br>\n	 '
-      + '</div>\n';
-  }
-
   onAdd(map: Map): this {
     this.map = map;
     this.map.on('zoomend, moveend', this.getFirePolygonOnceMoved);
     this.polygons = [];
-    console.log(map.getBounds());
-    console.log('on Add');
     const [start, end] = this.timeService.getRangeDate();
     this.startDate = start;
     this.endDate = end;
@@ -52,26 +31,37 @@ export class FirePolygonLayer extends LayerGroup {
 
   onRemove(map: Map): this {
     console.log('on remove');
-    this.polygon.remove();
+    if (this.polygon) {
+      this.polygon.remove();
+    }
+    if (this.markers) {
+      this.markers.forEach(circle => circle.remove());
+    }
     return this;
   }
 
   firePolygonDataHandler = (data) => {
     // adds the fire polygon to the map, the accuracy is based on the zoom level
     // this.polygons.forEach((polygon) => polygon.remove());
+    console.log(data);
     if (this.polygon) {
       this.polygon.remove();
     }
+    if (this.markers) {
+      this.markers.forEach(circle => circle.remove());
+    }
     if (this.map.getZoom() < 8) {
-      data.type = 'circle';
-      const size = 12.5;
-      const fireIcon = icon({
-        iconUrl: 'assets/image/perfectBird.gif',
-        iconSize: [size, size],
-      });
-      console.log(data);
-      this.polygon = geoJSON(data
-      ).addTo(this.map);
+      for (const singlePoint of data.features) {
+        const latlng = latLng(singlePoint.geometry.coordinates[1], singlePoint.geometry.coordinates[0]);
+        const size = this.map.getZoom() * this.map.getZoom();
+        const fireIcon = icon({
+          iconUrl: 'assets/image/pixelfire.gif',
+          iconSize: [size, size],
+        });
+        const singleMarker = marker(latlng, {icon: fireIcon}).bindPopup('<popup-box></popup-box>').openPopup();
+        singleMarker.addTo(this.map);
+        this.markers.push(singleMarker);
+      }
     } else {
       data.type = 'Polygon';
       console.log(data);
@@ -90,23 +80,6 @@ export class FirePolygonLayer extends LayerGroup {
   popUpContentZoomIn = (fireObject) => {
     console.log('success');
     console.log(fireObject);
-    /*
-    // creates css style for the pop up content
-    const fireInfoTemplate = $('<div />');
-    // tslint:disable-next-line:max-line-length
-    fireInfoTemplate.html('<button href="#" class="button-action" ' +
-        'style="color: #ff8420; font-family: "Dosis", Arial, Helvetica, sans-serif">Zoom In</button><br>')
-        .on('click',
-            '.button-action', () => {
-                // when the fire pop up is triggered, go into firePolygonZoomInDataHandler which handels the zoom in
-                console.log('xxx');
-                // this.fireObjectInfo = fireObject;
-                // this.fireService.searchFirePolygon(fireObject.id, 2).subscribe(this.firePolygonZoomInDataHandler);
-            });
-
-    const content = FirePolygonLayer.formatPopUpContent(fireObject);
-    fireInfoTemplate.append(content);
-    return fireInfoTemplate[0];*/
   };
   onEachFeature = (feature, layer) => {
     // controls the interaction between the mouse and the map

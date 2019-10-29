@@ -5,10 +5,11 @@ import {CoreMapComponent} from './core-map/core-map.component';
 
 import {ClickMarkerComponent} from './click-marker/click-marker.component';
 import {FirePolygonLayer} from './layer/fire-polygon.layer';
+import {PopupBoxComponent} from './popup-box/popup-box.component';
 
 
 @NgModule({
-  declarations: [CoreMapComponent, ClickMarkerComponent],
+  declarations: [CoreMapComponent, ClickMarkerComponent, PopupBoxComponent],
   imports: [
     CommonModule,
     LeafletModule,
