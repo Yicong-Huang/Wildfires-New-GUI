@@ -1,12 +1,16 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'popup-box',
-  templateUrl: './popup-box.component.html',
+  template: `
+      <button id="try">click</button>`,
   styleUrls: ['./popup-box.component.css']
 })
-export class PopupBoxComponent {
+export class PopupBoxComponent implements OnInit {
   constructor() {
+  }
+
+  ngOnInit() {
   }
 }
 

@@ -1,6 +1,8 @@
 import {GeoJSON, geoJSON, icon, latLng, LayerGroup, Map, marker, Marker} from 'leaflet';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
+import {NgElement, WithProperties} from '@angular/elements';
+import {PopupBoxComponent} from '../popup-box/popup-box.component';
 
 export class FirePolygonLayer extends LayerGroup {
 
@@ -58,7 +60,19 @@ export class FirePolygonLayer extends LayerGroup {
           iconUrl: 'assets/image/pixelfire.gif',
           iconSize: [size, size],
         });
-        const singleMarker = marker(latlng, {icon: fireIcon}).bindPopup('<popup-box></popup-box>').openPopup();
+        const singleMarker = marker(latlng, {icon: fireIcon}).bindPopup(fl => {
+          const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
+          // Listen to the close event
+          // popupEl.addEventListener('closed', () => document.body.removeChild(popupEl));
+          // const btn = document.getElementById('try');
+          // console.log(btn);
+          // if (btn) {
+          //   btn.addEventListener('click', (e: Event) => this.tryFunc());
+          // }
+          // Add to the DOM
+          document.body.appendChild(popupEl);
+          return popupEl;
+        }).openPopup();
         singleMarker.addTo(this.map);
         this.markers.push(singleMarker);
       }
@@ -80,6 +94,9 @@ export class FirePolygonLayer extends LayerGroup {
   popUpContentZoomIn = (fireObject) => {
     console.log('success');
     console.log(fireObject);
+  };
+  tryFunc = () => {
+    console.log('hello world');
   };
   onEachFeature = (feature, layer) => {
     // controls the interaction between the mouse and the map
