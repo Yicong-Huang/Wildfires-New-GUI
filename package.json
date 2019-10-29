@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 4200",
+    "start": "ng serve --port 4201",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -24,8 +24,10 @@
     "highcharts": "latest",
     "json2typescript": "^1.2.3",
     "leaflet": "^1.5.1",
+    "npm": "^6.12.0",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
+    "upgrade": "^1.1.0",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {

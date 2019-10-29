@@ -24,6 +24,7 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   addTweetsToMap(tweets: Tweet[], map: Map) {
+    console.log(tweets);
     for (const tweet of tweets) {
       this.addOneTweet(map, tweet.getLatLng());
     }
@@ -32,8 +33,7 @@ export class FireTweetLayer extends LayerGroup {
   addOneTweet(map: Map, latLng: LatLng) {
     const circle = circleMarker(latLng, {
       renderer: this.tweetRender,
-      color: this.tweetColor,
-      radius: 0.1
+      radius: 0.0001
     }).addTo(map);
     this.tweets.push(circle);
   }
