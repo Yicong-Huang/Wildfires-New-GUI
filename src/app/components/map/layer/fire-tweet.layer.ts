@@ -1,46 +1,46 @@
-import {canvas, CircleMarker, circleMarker, LatLng, LayerGroup, Map} from 'leaflet';
+import {canvas, CircleMarker, circleMarker, LatLng, LayerGroup, Map, Marker} from 'leaflet';
+import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
 import {Tweet} from '../../../models/tweet.model';
+import {from} from 'rxjs';
 
 
 export class FireTweetLayer extends LayerGroup {
 
   private map;
-  private tweetRender = canvas({padding: 0.5});
-  private tweetColor = 'red';
-  private tweets: CircleMarker[] = [];
+  private tweets: Marker[] = [];
+  private markerClusterData: Marker[] = [];
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
-
   }
 
   onAdd(map: Map): this {
     this.map = map;
-    this.tweetService.getFireTweetData().subscribe(tweets => this.addTweetsToMap(tweets, map));
-
+    if (this.tweets.length === 0) {
+      this.tweetService.getFireTweetData().subscribe(tweets => this.addTweetsToMap(tweets, map));
+    } else {
+      this.markerClusterData = this.tweets;
+    }
     return this;
   }
 
   addTweetsToMap(tweets: Tweet[], map: Map) {
-    console.log(tweets);
     for (const tweet of tweets) {
       this.addOneTweet(map, tweet.getLatLng());
     }
+    this.markerClusterData = this.tweets;
   }
 
   addOneTweet(map: Map, latLng: LatLng) {
-    const circle = circleMarker(latLng, {
-      renderer: this.tweetRender,
-      radius: 0.0001
-    }).addTo(map);
+    const circle = new Marker(latLng);
     this.tweets.push(circle);
   }
 
   onRemove(map: Map): this {
-    console.log('on remove');
     this.tweets.forEach(tweet => tweet.remove());
+    this.markerClusterData = [];
     return this;
   }
 

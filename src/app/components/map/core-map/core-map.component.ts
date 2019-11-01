@@ -1,10 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {latLng, LatLng, Map, tileLayer} from 'leaflet';
+import {latLng, LatLng, Map, tileLayer, Marker, control, MarkerClusterGroupOptions} from 'leaflet';
 import {FirePolygonLayer} from '../layer/fire-polygon.layer';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {FireTweetLayer} from '../layer/fire-tweet.layer';
 import {TweetService} from '../../../services/tweet/tweet.service';
+import {Tweet} from '../../../models/tweet.model';
+import 'leaflet.markercluster';
+
 
 @Component({
   selector: 'app-core-map',
@@ -12,6 +15,7 @@ import {TweetService} from '../../../services/tweet/tweet.service';
   styleUrls: ['./core-map.component.css']
 })
 export class CoreMapComponent implements OnInit {
+  private tweetLayer: any;
   constructor(private timeService: TimeService, private fireService: FireService, private tweetService: TweetService) {
 
   }
@@ -75,10 +79,13 @@ export class CoreMapComponent implements OnInit {
     overlays: {}
   };
 
-  ngOnInit() {
-    this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
-    this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer(this.timeService, this.tweetService);
+  markerClusterOptions: MarkerClusterGroupOptions;
 
+
+  ngOnInit() {
+      this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
+      this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer(this.timeService, this.tweetService);
+      this.tweetLayer = this.layersControl.overlays['Fire Tweets'];
   }
 
 
