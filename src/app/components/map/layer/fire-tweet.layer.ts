@@ -1,4 +1,4 @@
-import {canvas, CircleMarker, circleMarker, LatLng, LayerGroup, Map, Marker} from 'leaflet';
+import {canvas, CircleMarker, circleMarker, LatLng, LayerGroup, Map, Marker, Icon} from 'leaflet';
 import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
@@ -9,8 +9,9 @@ import {from} from 'rxjs';
 export class FireTweetLayer extends LayerGroup {
 
   private map;
-  private tweets: Marker[] = [];
-  private markerClusterData: Marker[] = [];
+  private tweets: CircleMarker[] = [];
+  private markerClusterData: CircleMarker[] = [];
+  private tweetIcon = new Icon({iconUrl: 'assets/image/perfectBird.gif', iconSize: [18, 18]});
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
@@ -34,7 +35,7 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   addOneTweet(map: Map, latLng: LatLng) {
-    const circle = new Marker(latLng);
+    const circle = new CircleMarker(latLng, {radius: 2, color: '#e25822', fillColor:'#e25822'} );
     this.tweets.push(circle);
   }
 
