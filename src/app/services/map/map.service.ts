@@ -19,6 +19,8 @@ export class MapService {
   markerRemove = new EventEmitter();
   searchNameLoaded = new EventEmitter();
   sendFireToFront = new EventEmitter();
+  zoomIn = new EventEmitter();
+
 
   constructor(private http: HttpClient) {
   }
@@ -54,4 +56,7 @@ export class MapService {
     }));
   }
 
+  zoom(firePolygonLL) {
+    this.zoomIn.next({zoomInBoundaries: firePolygonLL});
+  }
 }

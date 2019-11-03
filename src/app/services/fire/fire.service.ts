@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
@@ -10,11 +10,10 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class FireService {
-
+  public fireBoundingData;
+  public fireIdClicked = new EventEmitter();
   constructor(private http: HttpClient) {
-
   }
-
   searchFirePolygon(id, size): Observable<object> {
     return this.http.post(`${environment.API_BASE}/data/fire-with-id`, JSON.stringify({
       id,
@@ -39,10 +38,16 @@ export class FireService {
       startDate: start,
       endDate: end,
     })).pipe(map(data => {
-
       return {type: 'FeatureCollection', features: data};
     }));
   }
 
+  getFireBoundingBox(id): Observable<object> {
+    return this.searchFirePolygon(id, 2);
+  }
 
+  sendFireId(id) {
+    console.log('sending fire id');
+    this.fireIdClicked.next({fireId: id});
+  }
 }

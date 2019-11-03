@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {latLng, Map, MapOptions, tileLayer} from 'leaflet';
 import {FirePolygonLayer} from '../layer/fire-polygon.layer';
-import {TimeService} from '../../../services/time/time.service';
-import {FireService} from '../../../services/fire/fire.service';
 import {FireTweetLayer} from '../layer/fire-tweet.layer';
 import {TweetService} from '../../../services/tweet/tweet.service';
 import {WindLayer} from '../layer/wind.layer';
 import {WindService} from '../../../services/environmental-data/wind.service';
+import {TimeService} from '../../../services/time/time.service';
+import {FireService} from '../../../services/fire/fire.service';
+
 
 @Component({
   selector: 'app-core-map',
@@ -57,5 +58,7 @@ export class CoreMapComponent implements OnInit {
     this.map = map;
   }
 
-
+  zoomInToPolygon = ({zoomInBoundaries}) => {
+    this.map.fitBounds(zoomInBoundaries);
+  };
 }

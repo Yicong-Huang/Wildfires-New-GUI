@@ -62,15 +62,9 @@ export class FirePolygonLayer extends LayerGroup {
         });
         const singleMarker = marker(latlng, {icon: fireIcon}).bindPopup(fl => {
           const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
-          // Listen to the close event
-          // popupEl.addEventListener('closed', () => document.body.removeChild(popupEl));
-          // const btn = document.getElementById('try');
-          // console.log(btn);
-          // if (btn) {
-          //   btn.addEventListener('click', (e: Event) => this.tryFunc());
-          // }
-          // Add to the DOM
+          popupEl.fireId = singlePoint.id;
           document.body.appendChild(popupEl);
+          this.fireService.sendFireId(singlePoint.id);
           return popupEl;
         }).openPopup();
         singleMarker.addTo(this.map);
