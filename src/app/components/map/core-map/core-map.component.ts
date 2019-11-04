@@ -58,7 +58,7 @@ export class CoreMapComponent implements OnInit {
     this.map = map;
   }
 
-  zoomInToPolygon = ({zoomInBoundaries}) => {
+  zoomInToPolygon = (zoomInBoundaries) => {
     this.map.fitBounds(zoomInBoundaries);
   };
 }

@@ -14,7 +14,6 @@ export class PopupBoxComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fireId = this.fireId;
   }
 
   click() {

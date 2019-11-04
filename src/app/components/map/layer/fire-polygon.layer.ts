@@ -64,7 +64,6 @@ export class FirePolygonLayer extends LayerGroup {
           const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
           popupEl.fireId = singlePoint.id;
           document.body.appendChild(popupEl);
-          this.fireService.sendFireId(singlePoint.id);
           return popupEl;
         }).openPopup();
         singleMarker.addTo(this.map);
@@ -159,7 +158,6 @@ export class FirePolygonLayer extends LayerGroup {
       this.getFirePolygonData();
     }
   };
-
 
 }
 

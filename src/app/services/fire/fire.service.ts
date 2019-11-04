@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
@@ -10,8 +10,6 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class FireService {
-  public fireBoundingData;
-  public fireIdClicked = new EventEmitter();
   constructor(private http: HttpClient) {
   }
   searchFirePolygon(id, size): Observable<object> {
@@ -44,10 +42,5 @@ export class FireService {
 
   getFireBoundingBox(id): Observable<object> {
     return this.searchFirePolygon(id, 2);
-  }
-
-  sendFireId(id) {
-    console.log('sending fire id');
-    this.fireIdClicked.next({fireId: id});
   }
 }
