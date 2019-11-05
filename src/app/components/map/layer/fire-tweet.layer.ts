@@ -14,6 +14,7 @@ export class FireTweetLayer extends LayerGroup {
   private lastUpdateTime: Date = new Date();
   private isOn = false;
   private readonly markerClusterOptions: MarkerClusterGroupOptions;
+  private currentZoomLevel: number;
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
@@ -23,11 +24,30 @@ export class FireTweetLayer extends LayerGroup {
       disableClusteringAtZoom: 10
     };
 
+
   }
 
-  onAdd(map: Map): this {
-    this.map = map;
+  mapChangeHandler() {
+    const newZoomLevel = this.map.getZoom();
+    if (newZoomLevel <= this.currentZoomLevel) {
+      if (this.isOn) {
+        const now = new Date();
+        const [start, end] = this.timeService.getRangeDate();
+        this.updateTweets(start, end);
+        this.lastUpdateTime = now;
+      }
+    }
+    this.currentZoomLevel = newZoomLevel;
 
+  }
+
+
+  onAdd(map: Map): this {
+    if (this.map === undefined) {
+      this.map = map;
+      this.map.on('moveend', () => this.mapChangeHandler());
+    }
+    this.currentZoomLevel = this.map.getZoom();
     this.isOn = true;
     if (this.tweets.length === 0) {
       const [start, end] = this.timeService.getRangeDate();
@@ -40,6 +60,7 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   addTweetsToMap(tweets: Tweet[], map: Map) {
+    this.removeTweets();
     for (const tweet of tweets) {
       this.addOneTweet(map, tweet.getLatLng());
     }
@@ -72,7 +93,6 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   timeRangeChangeHandler({start, end}) {
-
     if (this.isOn) {
       const now = new Date();
       const diffInSecs = (now.getTime() - this.lastUpdateTime.getTime()) / 1000;
@@ -86,9 +106,6 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   updateTweets(start, end) {
-
-
-    this.removeTweets();
     const bound = this.map.getBounds();
     this.tweetService.getFireTweetData({
       lat: bound._northEast.lat, lon: bound._southWest.lng
@@ -111,7 +128,6 @@ export class FireTweetLayer extends LayerGroup {
       southWest.lat + latSpan * Math.random(),
       southWest.lng + lngSpan * Math.random());
   }
-
 
 }
 
