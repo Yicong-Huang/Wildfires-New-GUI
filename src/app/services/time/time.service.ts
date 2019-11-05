@@ -25,7 +25,7 @@ import {Tweet} from '../../models/tweet.model';
  *
  */
 export class TimeService {
-  public timeRangeChange = new EventEmitter();
+  public timeRangeChangeEvent = new EventEmitter();
   private currentDateInYMD = undefined;
   private rangeStartDateInMS = new Date().getTime() - 6 * 30 * 24 * 3600 * 1000;
   private rangeEndDateInMS = new Date().getTime();
@@ -52,13 +52,13 @@ export class TimeService {
   }
 
   getTweetByDate(startDate, endDate): Observable<Tweet[]> {
-    return this.http.get<Tweet[]>(`http://${environment.host}:${environment.port}/tweet/tweet-by-date`,
+    return this.http.get<Tweet[]>(`${environment.API_BASE}/tweet/tweet-by-date`,
       {params: new HttpParams().set('start-date', startDate).set('end-date', endDate)});
   }
 
   sendTimeRange() {
     console.log('sending time');
-    this.timeRangeChange.next({start: this.rangeStartDateInMS, end: this.rangeEndDateInMS});
+    this.timeRangeChangeEvent.next({start: this.rangeStartDateInMS, end: this.rangeEndDateInMS});
   }
 }
 

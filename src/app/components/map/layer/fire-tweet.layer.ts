@@ -1,9 +1,8 @@
-import {canvas, CircleMarker, circleMarker, LatLng, LayerGroup, Map, Marker, Icon} from 'leaflet';
+import {CircleMarker, Icon, LatLng, LayerGroup, Map, MarkerClusterGroupOptions} from 'leaflet';
 import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
 import {Tweet} from '../../../models/tweet.model';
-import {from} from 'rxjs';
 
 
 export class FireTweetLayer extends LayerGroup {
@@ -12,18 +11,31 @@ export class FireTweetLayer extends LayerGroup {
   private tweets: CircleMarker[] = [];
   private markerClusterData: CircleMarker[] = [];
   private tweetIcon = new Icon({iconUrl: 'assets/image/perfectBird.gif', iconSize: [18, 18]});
+  private lastUpdateTime: Date = new Date();
+  private isOn = false;
+  private readonly markerClusterOptions: MarkerClusterGroupOptions;
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
+    this.timeService.timeRangeChangeEvent.subscribe((event) => this.timeRangeChangeHandler(event));
+    this.markerClusterOptions = {
+      spiderfyOnMaxZoom: false,
+      disableClusteringAtZoom: 10
+    };
+
   }
 
   onAdd(map: Map): this {
     this.map = map;
+
+    this.isOn = true;
     if (this.tweets.length === 0) {
-      this.tweetService.getFireTweetData().subscribe(tweets => this.addTweetsToMap(tweets, map));
+      const [start, end] = this.timeService.getRangeDate();
+      this.updateTweets(start, end);
     } else {
       this.markerClusterData = this.tweets;
     }
+
     return this;
   }
 
@@ -35,16 +47,58 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   addOneTweet(map: Map, latLng: LatLng) {
-    const circle = new CircleMarker(latLng, {radius: 2, color: '#e25822', fillColor:'#e25822'} );
-    this.tweets.push(circle);
+    this.tweets.push(new CircleMarker(latLng, {radius: 2, color: '#e25822', fillColor: '#e25822'}));
   }
 
   onRemove(map: Map): this {
-    this.tweets.forEach(tweet => tweet.remove());
-    this.markerClusterData = [];
+    this.removeTweets();
+    this.isOn = false;
     return this;
   }
 
+  removeTweets() {
+    this.tweets.forEach(tweet => tweet.remove());
+    this.markerClusterData = [];
+    this.tweets = [];
+
+  }
+
+  getTweets() {
+    return this.markerClusterData;
+  }
+
+  getMarkerClusterOptions() {
+    return this.markerClusterOptions;
+  }
+
+  timeRangeChangeHandler({start, end}) {
+
+    if (this.isOn) {
+      const now = new Date();
+      const diffInSecs = (now.getTime() - this.lastUpdateTime.getTime()) / 1000;
+
+      if (diffInSecs > 1) {
+        this.updateTweets(start, end);
+        this.lastUpdateTime = now;
+      }
+    }
+
+  }
+
+  updateTweets(start, end) {
+
+
+    this.removeTweets();
+    const bound = this.map.getBounds();
+    this.tweetService.getFireTweetData({
+      lat: bound._northEast.lat, lon: bound._southWest.lng
+    }, {
+      lat: bound._southWest.lat, lon: bound._northEast.lng
+    }, start, end).subscribe(tweets => {
+      this.addTweetsToMap(tweets, this.map);
+    });
+
+  }
 
   // TODO: for test purpose only, to be removed
   generatingLatLng(): LatLng {
@@ -57,6 +111,7 @@ export class FireTweetLayer extends LayerGroup {
       southWest.lat + latSpan * Math.random(),
       southWest.lng + lngSpan * Math.random());
   }
+
 
 }
 

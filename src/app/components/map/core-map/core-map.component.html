@@ -8,8 +8,7 @@
        [leafletOptions]="options"
        [leafletZoom]="zoom"
        (leafletMapReady)="onMapReady($event)"
-
-       [leafletMarkerCluster]="this.tweetLayer.markerClusterData"
-       [leafletMarkerClusterOptions]="markerClusterOptions">
+       [leafletMarkerClusterOptions]="tweetLayer.getMarkerClusterOptions()"
+       [leafletMarkerCluster]="tweetLayer.getTweets()">
   </div>
 </div>
