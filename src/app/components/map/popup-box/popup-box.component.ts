@@ -4,12 +4,14 @@ import {MapService} from '../../../services/map/map.service';
 
 @Component({
   selector: 'popup-box',
-  templateUrl: './popup-box.component.html',
+  template: '<button (click)="click()">{{ message }}</button>',
   styleUrls: ['./popup-box.component.css']
 })
 export class PopupBoxComponent implements OnInit {
-  @ Input() fireId: string;
-
+  @Input() fireId: string;
+  @Input() message = 'Default Pop-up Message.';
+  @Input() zoomOutCenter;
+  @Input() zoomOutLevel;
   constructor(private fireService: FireService, private mapService: MapService) {
   }
 
@@ -17,7 +19,11 @@ export class PopupBoxComponent implements OnInit {
   }
 
   click() {
-    this.fireService.getFireBoundingBox(this.fireId).subscribe(this.mapZoomInHandler);
+    if (this.message === 'zoom in') {
+      this.fireService.getFireBoundingBox(this.fireId).subscribe(this.mapZoomInHandler);
+    } else {
+      this.mapService.zoomOut(this.zoomOutCenter, this.zoomOutLevel);
+    }
   }
 
   mapZoomInHandler = (data) => {
@@ -27,7 +33,8 @@ export class PopupBoxComponent implements OnInit {
     for (const item of bbox) {// changes the lat and lng because the geojson format is different to the leaflet latlng format
       firePolygonLL.push([parseFloat(item[1]), parseFloat(item[0])]);
     }
-    this.mapService.zoom(firePolygonLL);
+    console.log('firePolygonLL' + firePolygonLL);
+    this.mapService.zoomIn(firePolygonLL);
   }
 }
 

@@ -14,11 +14,11 @@ export class FirePolygonLayer extends LayerGroup {
   private polygons: GeoJSON[];
   private polygon: GeoJSON;
   private markers: Marker[] = [];
-  private firePolygon;
   private startDate;
   private endDate;
   private map;
-  private fireObjectInfo;
+  private zoomOutLevel;
+  private zoomOutCenter;
 
   onAdd(map: Map): this {
     this.map = map;
@@ -44,8 +44,6 @@ export class FirePolygonLayer extends LayerGroup {
 
   firePolygonDataHandler = (data) => {
     // adds the fire polygon to the map, the accuracy is based on the zoom level
-    // this.polygons.forEach((polygon) => polygon.remove());
-    console.log(data);
     if (this.polygon) {
       this.polygon.remove();
     }
@@ -63,6 +61,9 @@ export class FirePolygonLayer extends LayerGroup {
         const singleMarker = marker(latlng, {icon: fireIcon}).bindPopup(fl => {
           const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
           popupEl.fireId = singlePoint.id;
+          popupEl.message = `zoom in`;
+          this.zoomOutCenter = this.map.getCenter();
+          this.zoomOutLevel = this.map.getZoom();
           document.body.appendChild(popupEl);
           return popupEl;
         }).openPopup();
@@ -92,6 +93,17 @@ export class FirePolygonLayer extends LayerGroup {
     console.log('hello world');
   };
   onEachFeature = (feature, layer) => {
+    layer.bindPopup(fl => {
+      const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
+      // Listen to the close event
+      popupEl.addEventListener('closed', () => document.body.removeChild(popupEl));
+      popupEl.message = `zoom out`;
+      popupEl.zoomOutCenter = this.zoomOutCenter;
+      popupEl.zoomOutLevel = this.zoomOutLevel;
+      // Add to the DOM
+      document.body.appendChild(popupEl);
+      return popupEl;
+    });
     // controls the interaction between the mouse and the map
     layer.on({
       // mouseover: this.highlightFeature,
@@ -141,7 +153,6 @@ export class FirePolygonLayer extends LayerGroup {
     } else {
       size = 2;
     }
-    console.log('zoom ', zoom);
     // processes given time data from time-series
     // const [start, end] = this.timeService.getRangeDate();
     const dateStartInISO = new Date(this.startDate).toISOString();
@@ -150,7 +161,8 @@ export class FirePolygonLayer extends LayerGroup {
     console.log(bound);
     const boundNE = {lat: bound._northEast.lat, lon: bound._northEast.lng};
     const boundSW = {lat: bound._southWest.lat, lon: bound._southWest.lng};
-    this.fireService.getFirePolygonData(boundNE, boundSW, size, dateStartInISO, dateEndInISO).subscribe(this.firePolygonDataHandler);
+    this.fireService.getFirePolygonData(boundNE, boundSW, size,
+      dateStartInISO, dateEndInISO).subscribe((event) => this.firePolygonDataHandler(event));
   }
 
   getFirePolygonOnceMoved = () => {

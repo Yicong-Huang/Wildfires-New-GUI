@@ -7,6 +7,7 @@ import {WindLayer} from '../layer/wind.layer';
 import {WindService} from '../../../services/environmental-data/wind.service';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
+import {MapService} from '../../../services/map/map.service';
 
 
 @Component({
@@ -43,9 +44,10 @@ export class CoreMapComponent implements OnInit {
     layers: [this.layers.Dark]
   };
 
-  constructor(private timeService: TimeService, private fireService: FireService, private windService: WindService,
-              private tweetService: TweetService) {
-
+  constructor(private mapService: MapService, private timeService: TimeService, private windService: WindService,
+              private fireService: FireService, private tweetService: TweetService) {
+    this.mapService.zoomInPolygonEvent.subscribe(this.zoomInToPolygon);
+    this.mapService.zoomOutPolygonEvent.subscribe(this.zoomOutMap);
   }
 
   ngOnInit() {
@@ -61,4 +63,8 @@ export class CoreMapComponent implements OnInit {
   zoomInToPolygon = (zoomInBoundaries) => {
     this.map.fitBounds(zoomInBoundaries);
   };
+
+  zoomOutMap = ({center, layer}) => {
+    this.map.setView(center, layer);
+  }
 }
