@@ -1,4 +1,4 @@
-import {CircleMarker, Icon, LatLng, LayerGroup, Map, MarkerClusterGroupOptions} from 'leaflet';
+import {Canvas, canvas, CircleMarker, Icon, LatLng, LayerGroup, Map, MarkerClusterGroupOptions} from 'leaflet';
 import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
@@ -13,16 +13,20 @@ export class FireTweetLayer extends LayerGroup {
   private tweetIcon = new Icon({iconUrl: 'assets/image/perfectBird.gif', iconSize: [18, 18]});
   private lastUpdateTime: Date = new Date();
   private isOn = false;
-  private readonly markerClusterOptions: MarkerClusterGroupOptions;
   private currentZoomLevel: number;
+
+  private readonly markerClusterOptions: MarkerClusterGroupOptions;
+  private readonly canvas: Canvas;
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
     this.timeService.timeRangeChangeEvent.subscribe((event) => this.timeRangeChangeHandler(event));
     this.markerClusterOptions = {
       spiderfyOnMaxZoom: false,
-      disableClusteringAtZoom: 10
+      disableClusteringAtZoom: 8,
+      chunkedLoading: true
     };
+    this.canvas = canvas({padding: 0.5});
 
 
   }
@@ -68,7 +72,10 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   addOneTweet(map: Map, latLng: LatLng) {
-    this.tweets.push(new CircleMarker(latLng, {radius: 2, color: '#e25822', fillColor: '#e25822'}));
+    this.tweets.push(new CircleMarker(latLng, {
+      radius: 2, color: '#e25822', fillColor: '#e25822',
+      renderer: this.canvas
+    }));
   }
 
   onRemove(map: Map): this {
