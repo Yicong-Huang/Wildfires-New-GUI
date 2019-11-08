@@ -1,4 +1,4 @@
-import {Canvas, canvas, CircleMarker, Icon, LatLng, LayerGroup, Map, MarkerClusterGroupOptions} from 'leaflet';
+import {Canvas, canvas, CircleMarker, Icon, LatLngBounds, LayerGroup, Map, MarkerClusterGroup, MarkerClusterGroupOptions} from 'leaflet';
 import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
@@ -9,14 +9,15 @@ export class FireTweetLayer extends LayerGroup {
 
   private map;
   private tweets: CircleMarker[] = [];
-  private markerClusterData: CircleMarker[] = [];
   private tweetIcon = new Icon({iconUrl: 'assets/image/perfectBird.gif', iconSize: [18, 18]});
   private lastUpdateTime: Date = new Date();
   private isOn = false;
   private currentZoomLevel: number;
+  private currentMapBound: LatLngBounds;
 
   private readonly markerClusterOptions: MarkerClusterGroupOptions;
   private readonly canvas: Canvas;
+  private clusterGroup: MarkerClusterGroup;
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
@@ -28,28 +29,18 @@ export class FireTweetLayer extends LayerGroup {
     };
     this.canvas = canvas({padding: 0.5});
 
-
   }
 
-  mapChangeHandler() {
-    const newZoomLevel = this.map.getZoom();
-    if (newZoomLevel <= this.currentZoomLevel) {
-      if (this.isOn) {
-        const now = new Date();
-        const [start, end] = this.timeService.getRangeDate();
-        this.updateTweets(start, end);
-        this.lastUpdateTime = now;
-      }
-    }
-    this.currentZoomLevel = newZoomLevel;
+  markerClusterReady(markerClusterGroup: MarkerClusterGroup) {
+    this.clusterGroup = markerClusterGroup;
 
   }
-
 
   onAdd(map: Map): this {
     if (this.map === undefined) {
       this.map = map;
       this.map.on('moveend', () => this.mapChangeHandler());
+      this.currentMapBound = this.map.getBounds();
     }
     this.currentZoomLevel = this.map.getZoom();
     this.isOn = true;
@@ -57,42 +48,26 @@ export class FireTweetLayer extends LayerGroup {
       const [start, end] = this.timeService.getRangeDate();
       this.updateTweets(start, end);
     } else {
-      this.markerClusterData = this.tweets;
+      this.clusterGroup.addLayers(this.tweets);
     }
-
     return this;
   }
 
-  addTweetsToMap(tweets: Tweet[], map: Map) {
-    this.removeTweets();
-    for (const tweet of tweets) {
-      this.addOneTweet(map, tweet.getLatLng());
-    }
-    this.markerClusterData = this.tweets;
-  }
-
-  addOneTweet(map: Map, latLng: LatLng) {
-    this.tweets.push(new CircleMarker(latLng, {
-      radius: 2, color: '#e25822', fillColor: '#e25822',
-      renderer: this.canvas
-    }));
-  }
-
   onRemove(map: Map): this {
-    this.removeTweets();
+    this.clusterGroup.clearLayers();
     this.isOn = false;
     return this;
   }
 
-  removeTweets() {
-    this.tweets.forEach(tweet => tweet.remove());
-    this.markerClusterData = [];
+  addTweetsToMap(tweets: Tweet[]) {
     this.tweets = [];
-
-  }
-
-  getTweets() {
-    return this.markerClusterData;
+    for (const tweet of tweets) {
+      this.tweets.push(new CircleMarker(tweet.getLatLng(), {
+        radius: 2, color: '#e25822', fillColor: '#e25822',
+        renderer: this.canvas
+      }));
+    }
+    this.clusterGroup.addLayers(this.tweets);
   }
 
   getMarkerClusterOptions() {
@@ -112,6 +87,23 @@ export class FireTweetLayer extends LayerGroup {
 
   }
 
+  mapChangeHandler() {
+    const newZoomLevel = this.map.getZoom();
+    this.currentMapBound = this.map.getBounds();
+
+    if (newZoomLevel <= this.currentZoomLevel) {
+
+      if (this.isOn) {
+        const now = new Date();
+        const [start, end] = this.timeService.getRangeDate();
+        this.updateTweets(start, end);
+        this.lastUpdateTime = now;
+      }
+    }
+    this.currentZoomLevel = newZoomLevel;
+
+  }
+
   updateTweets(start, end) {
     const bound = this.map.getBounds();
     this.tweetService.getFireTweetData({
@@ -119,21 +111,10 @@ export class FireTweetLayer extends LayerGroup {
     }, {
       lat: bound._southWest.lat, lon: bound._northEast.lng
     }, start, end).subscribe(tweets => {
-      this.addTweetsToMap(tweets, this.map);
+      this.clusterGroup.clearLayers();
+      this.addTweetsToMap(tweets);
     });
 
-  }
-
-  // TODO: for test purpose only, to be removed
-  generatingLatLng(): LatLng {
-    const bounds = this.map.getBounds();
-    const southWest = bounds.getSouthWest();
-    const northEast = bounds.getNorthEast();
-    const lngSpan = northEast.lng - southWest.lng;
-    const latSpan = northEast.lat - southWest.lat;
-    return new LatLng(
-      southWest.lat + latSpan * Math.random(),
-      southWest.lng + lngSpan * Math.random());
   }
 
 }
