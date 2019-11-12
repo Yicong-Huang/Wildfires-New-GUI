@@ -9,10 +9,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {environment} from '../../../environments/environment';
-import {HttpClient, HttpParams} from '@angular/common/http';
-import {Tweet} from '../../models/tweet.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,10 +25,6 @@ export class TimeService {
   private currentDateInYMD = undefined;
   private rangeStartDateInMS = new Date().getTime() - 6 * 30 * 24 * 3600 * 1000;
   private rangeEndDateInMS = new Date().getTime();
-
-  constructor(private http: HttpClient) {
-
-  }
 
   setCurrentDate(dateInYMD: string): void {
     this.currentDateInYMD = dateInYMD;
@@ -51,13 +43,7 @@ export class TimeService {
     return [this.rangeStartDateInMS, this.rangeEndDateInMS];
   }
 
-  getTweetByDate(startDate, endDate): Observable<Tweet[]> {
-    return this.http.get<Tweet[]>(`${environment.API_BASE}/tweet/tweet-by-date`,
-      {params: new HttpParams().set('start-date', startDate).set('end-date', endDate)});
-  }
-
   sendTimeRange() {
-    console.log('sending time');
     this.timeRangeChangeEvent.next({start: this.rangeStartDateInMS, end: this.rangeEndDateInMS});
   }
 }
