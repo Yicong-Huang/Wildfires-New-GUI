@@ -1,9 +1,38 @@
-import {Canvas, canvas, CircleMarker, Icon, LatLngBounds, LayerGroup, Map, MarkerClusterGroup, MarkerClusterGroupOptions} from 'leaflet';
+import {
+  Canvas,
+  canvas,
+  CircleMarker,
+  CircleMarkerOptions,
+  Icon,
+  LatLngBounds,
+  LayerGroup,
+  Map,
+  MarkerClusterGroup,
+  MarkerClusterGroupOptions
+} from 'leaflet';
 import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
 import {Tweet} from '../../../models/tweet.model';
 
+export class TweetMarker extends CircleMarker {
+  constructor(tweet: Tweet, options?: CircleMarkerOptions) {
+    super(tweet.getLatLng(), options);
+    this.tweet = tweet;
+  }
+
+  private _tweet: Tweet;
+
+  get tweet() {
+    return this._tweet;
+  }
+
+  set tweet(value: Tweet) {
+    this._tweet = value;
+  }
+
+
+}
 
 export class FireTweetLayer extends LayerGroup {
 
@@ -59,13 +88,18 @@ export class FireTweetLayer extends LayerGroup {
     return this;
   }
 
+
   addTweetsToMap(tweets: Tweet[]) {
     this.tweets = [];
     for (const tweet of tweets) {
-      this.tweets.push(new CircleMarker(tweet.getLatLng(), {
+
+
+      this.tweets.push(new TweetMarker(tweet, {
         radius: 2, color: '#e25822', fillColor: '#e25822',
         renderer: this.canvas
       }));
+
+
     }
     this.clusterGroup.addLayers(this.tweets);
   }
@@ -121,7 +155,12 @@ export class FireTweetLayer extends LayerGroup {
   private removeTweetsFromMap() {
     const removeLayers = [];
     for (const layer of this.clusterGroup.getLayers()) {
-      if (!(layer instanceof CircleMarker && this.map.getBounds().contains(layer.getLatLng()))) {
+      if (!(layer instanceof TweetMarker && (this.map.getBounds().contains(layer.getLatLng())))) {
+        removeLayers.push(layer);
+      }
+      const [start, end] = this.timeService.getRangeDate();
+      const tweetTime = layer['tweet'].createAt.getTime();
+      if (tweetTime < start || tweetTime > end) {
         removeLayers.push(layer);
       }
     }
