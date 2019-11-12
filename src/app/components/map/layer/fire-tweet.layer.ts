@@ -89,15 +89,18 @@ export class FireTweetLayer extends LayerGroup {
 
   mapChangeHandler() {
     const newZoomLevel = this.map.getZoom();
-    this.currentMapBound = this.map.getBounds();
+
 
     if (newZoomLevel <= this.currentZoomLevel) {
 
       if (this.isOn) {
         const now = new Date();
+
+
         const [start, end] = this.timeService.getRangeDate();
         this.updateTweets(start, end);
         this.lastUpdateTime = now;
+
       }
     }
     this.currentZoomLevel = newZoomLevel;
@@ -105,17 +108,24 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   updateTweets(start, end) {
-    const bound = this.map.getBounds();
-    this.tweetService.getFireTweetData({
-      lat: bound._northEast.lat, lon: bound._southWest.lng
-    }, {
-      lat: bound._southWest.lat, lon: bound._northEast.lng
-    }, start, end).subscribe(tweets => {
-      this.clusterGroup.clearLayers();
+    const newMapBound = this.map.getBounds();
+    this.tweetService.getFireTweetData(this.currentMapBound, newMapBound, start, end).subscribe(tweets => {
+
       this.addTweetsToMap(tweets);
     });
+    this.removeTweetsFromMap();
+    this.currentMapBound = newMapBound;
 
   }
 
+  private removeTweetsFromMap() {
+    const removeLayers = [];
+    for (const layer of this.clusterGroup.getLayers()) {
+      if (!(layer instanceof CircleMarker && this.map.getBounds().contains(layer.getLatLng()))) {
+        removeLayers.push(layer);
+      }
+    }
+    this.clusterGroup.removeLayers(removeLayers);
+  }
 }
 

@@ -8,6 +8,7 @@ import {TweetCount} from '../../models/tweet-count.model';
 import {Tweet} from '../../models/tweet.model';
 
 import {JsonService} from '../json/json.service';
+import {LatLngBounds} from 'leaflet';
 
 
 @Injectable({
@@ -22,11 +23,11 @@ export class TweetService {
     return this.http.get<TweetCount[]>(`${environment.API_BASE}/tweet/tweet-count`);
   }
 
-  getFireTweetData(northEastBoundaries, southWestBoundaries, start, end): Observable<Tweet[]> {
-    return this.jsonService.deserialize(this.http.post<Tweet[]>(`${environment.API_BASE}/tweet/fire-tweet`,
+  getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, start, end): Observable<Tweet[]> {
+    return this.jsonService.deserialize(this.http.post<Tweet[]>(`${environment.API_BASE}/tweet/fire-tweet2`,
       JSON.stringify({
-        northEast: northEastBoundaries,
-        southWest: southWestBoundaries,
+        oldBound,
+        newBound,
         startDate: start,
         endDate: end,
       })
