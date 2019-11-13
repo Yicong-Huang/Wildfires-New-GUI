@@ -4,7 +4,7 @@ import {MapService} from '../../../services/map/map.service';
 
 @Component({
   selector: 'popup-box',
-  template: '<button (click)="click()">{{ message }}</button>',
+  templateUrl: './popup-box.component.html',
   styleUrls: ['./popup-box.component.css']
 })
 export class PopupBoxComponent implements OnInit {
@@ -12,6 +12,7 @@ export class PopupBoxComponent implements OnInit {
   @Input() message = 'Default Pop-up Message.';
   @Input() zoomOutCenter;
   @Input() zoomOutLevel;
+  private showDisplayButton = false;
   constructor(private fireService: FireService, private mapService: MapService) {
   }
 
@@ -20,8 +21,10 @@ export class PopupBoxComponent implements OnInit {
 
   click() {
     if (this.message === 'zoom in') {
+      this.showDisplayButton = false;
       this.fireService.getFireBoundingBox(this.fireId).subscribe(this.mapZoomInHandler);
     } else {
+      this.showDisplayButton = true;
       this.mapService.zoomOut(this.zoomOutCenter, this.zoomOutLevel);
     }
   }
@@ -35,6 +38,16 @@ export class PopupBoxComponent implements OnInit {
     }
     console.log('firePolygonLL' + firePolygonLL);
     this.mapService.zoomIn(firePolygonLL);
+  };
+  currentStyles = () => {
+    return {
+      display: this.message === 'zoom out' ? 'block' : 'none'
+    };
+  };
+
+
+  displayMultiplePolygon() {
+    this.fireService.getMultiplePolygon(this.fireId);
   }
 }
 

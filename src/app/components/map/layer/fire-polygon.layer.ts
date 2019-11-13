@@ -3,13 +3,11 @@ import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {NgElement, WithProperties} from '@angular/elements';
 import {PopupBoxComponent} from '../popup-box/popup-box.component';
+import {MapService} from '../../../services/map/map.service';
 
 export class FirePolygonLayer extends LayerGroup {
 
-  constructor(private timeService: TimeService, private fireService: FireService) {
-    super();
-    this.timeService.timeRangeChange$.subscribe(this.timeRangeChangeFirePolygonHandler);
-  }
+  private zoomOutLevel = 5;
 
   private polygons: GeoJSON[];
   private polygon: GeoJSON;
@@ -17,8 +15,14 @@ export class FirePolygonLayer extends LayerGroup {
   private startDate;
   private endDate;
   private map;
-  private zoomOutLevel;
-  private zoomOutCenter;
+  private zoomOutCenter = [33.64, -117.84];
+
+  constructor(private timeService: TimeService, private fireService: FireService, private mapService: MapService) {
+    super();
+    this.timeService.timeRangeChange.subscribe(this.timeRangeChangeFirePolygonHandler);
+    this.fireService.getMultiplePolygonEvent.subscribe(this.getMultiplePolygon);
+
+  }
 
   onAdd(map: Map): this {
     this.map = map;
@@ -72,7 +76,6 @@ export class FirePolygonLayer extends LayerGroup {
       }
     } else {
       data.type = 'Polygon';
-      console.log(data);
       this.polygon = geoJSON(data, {
         style: () => ({
           fillColor: 'yellow',
@@ -85,14 +88,8 @@ export class FirePolygonLayer extends LayerGroup {
       }).addTo(this.map);
     }
   };
-  popUpContentZoomIn = (fireObject) => {
-    console.log('success');
-    console.log(fireObject);
-  };
-  tryFunc = () => {
-    console.log('hello world');
-  };
-  onEachFeature = (feature, layer) => {
+
+  bindPopupBox = (feature, layer) => {
     layer.bindPopup(fl => {
       const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
       // Listen to the close event
@@ -100,19 +97,25 @@ export class FirePolygonLayer extends LayerGroup {
       popupEl.message = `zoom out`;
       popupEl.zoomOutCenter = this.zoomOutCenter;
       popupEl.zoomOutLevel = this.zoomOutLevel;
+      popupEl.fireId = feature.id;
       // Add to the DOM
       document.body.appendChild(popupEl);
       return popupEl;
     });
-    // controls the interaction between the mouse and the map
+  };
+
+  onEachFeature = (feature, layer) => {
+    console.log(feature);
+    console.log(layer);
     layer.on({
-      // mouseover: this.highlightFeature,
-      // mouseout: this.resetHighlight,
+      mouseover: this.highlightFeature,
+      mouseout: this.resetHighlight,
       click: this.zoomToFeature
     });
+    this.bindPopupBox(feature, layer);
+    // controls the interaction between the mouse and the map
   };
   highlightFeature = (event) => {
-    console.log(event);
     // highlights the region when the mouse moves over the region
     const layer = event.target;
     layer.setStyle({
@@ -124,23 +127,23 @@ export class FirePolygonLayer extends LayerGroup {
 
   };
   resetHighlight = (event) => {
-    console.log(event);
     // gets rid of the highlight when the mouse moves out of the region
-
     this.polygon.resetStyle(event.target);
   };
 
   zoomToFeature = (event) => {
-    console.log(event);
-    // const latLngs = [event.target.getLatLng()];
-    // const markerBounds = latLngBounds(latLngs);
-    // this.map.fitBounds(markerBounds);
+    this.mapService.zoomIn(event.target.getBounds());
+    // this.bindPopupBox(event.sourceTarget.feature, event.sourceTarget);
   };
 
   timeRangeChangeFirePolygonHandler = ({start, end}) => {
     this.startDate = start;
     this.endDate = end;
     this.getFirePolygonData();
+  };
+
+  getMultiplePolygon = (id) => {
+    this.fireService.searchSeparatedFirePolygon(id, 2).subscribe(this.firePolygonDataHandler);
   };
 
   getFirePolygonData() {
@@ -158,7 +161,6 @@ export class FirePolygonLayer extends LayerGroup {
     const dateStartInISO = new Date(this.startDate).toISOString();
     const dateEndInISO = new Date(this.endDate).toISOString();
     const bound = this.map.getBounds();
-    console.log(bound);
     const boundNE = {lat: bound._northEast.lat, lon: bound._northEast.lng};
     const boundSW = {lat: bound._southWest.lat, lon: bound._southWest.lng};
     this.fireService.getFirePolygonData(boundNE, boundSW, size,
