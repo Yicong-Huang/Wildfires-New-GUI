@@ -25,6 +25,8 @@
     "highcharts": "latest",
     "json2typescript": "^1.2.3",
     "leaflet": "^1.5.1",
+    "leaflet-maskcanvas": "^1.0.0",
+    "leaflet-velocity-ts": "^1.1.7",
     "npm": "^6.12.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",

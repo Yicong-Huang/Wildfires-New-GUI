@@ -5,6 +5,8 @@ import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {FireTweetLayer} from '../layer/fire-tweet.layer';
 import {TweetService} from '../../../services/tweet/tweet.service';
+import {WindLayer} from '../layer/wind.layer';
+import {MapService} from '../../../services/map/map.service';
 
 @Component({
   selector: 'app-core-map',
@@ -78,6 +80,7 @@ export class CoreMapComponent implements OnInit {
   ngOnInit() {
     this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
     this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer(this.timeService, this.tweetService);
+    this.layersControl.overlays['Global Wind'] = new WindLayer(this.fireService);
 
   }
 
