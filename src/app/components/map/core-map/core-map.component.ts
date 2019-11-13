@@ -6,7 +6,6 @@ import {FireService} from '../../../services/fire/fire.service';
 import {FireTweetLayer} from '../layer/fire-tweet.layer';
 import {TweetService} from '../../../services/tweet/tweet.service';
 import {WindLayer} from '../layer/wind.layer';
-import {MapService} from '../../../services/map/map.service';
 
 @Component({
   selector: 'app-core-map',
