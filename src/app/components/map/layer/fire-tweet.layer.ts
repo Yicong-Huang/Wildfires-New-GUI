@@ -3,7 +3,6 @@ import {
   canvas,
   CircleMarker,
   CircleMarkerOptions,
-  Icon,
   LatLngBounds,
   LayerGroup,
   Map,
@@ -14,14 +13,16 @@ import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
 import {Tweet} from '../../../models/tweet.model';
+import {fromEvent, Observable, of} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 export class TweetMarker extends CircleMarker {
+  private _tweet: Tweet;
+
   constructor(tweet: Tweet, options?: CircleMarkerOptions) {
     super(tweet.getLatLng(), options);
     this.tweet = tweet;
   }
-
-  private _tweet: Tweet;
 
   get tweet() {
     return this._tweet;
@@ -30,55 +31,51 @@ export class TweetMarker extends CircleMarker {
   set tweet(value: Tweet) {
     this._tweet = value;
   }
-
-
 }
 
 export class FireTweetLayer extends LayerGroup {
 
   private map;
-  private tweets: CircleMarker[] = [];
-  private tweetIcon = new Icon({iconUrl: 'assets/image/perfectBird.gif', iconSize: [18, 18]});
-  private lastUpdateTime: Date = new Date();
+  private tweets: TweetMarker[] = [];
   private isOn = false;
-  private currentZoomLevel: number;
   private currentMapBound: LatLngBounds;
+  private currentTimeRange: number[];
 
   private readonly markerClusterOptions: MarkerClusterGroupOptions;
   private readonly canvas: Canvas;
   private clusterGroup: MarkerClusterGroup;
+  private tweetMarkerStyleOption: CircleMarkerOptions = {
+    radius: 2, color: '#e25822', fillColor: '#e25822',
+    renderer: this.canvas
+  };
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
-    this.timeService.timeRangeChangeEvent.subscribe((event) => this.timeRangeChangeHandler(event));
+
+    this.timeService.timeRangeChange$.pipe(switchMap(() => this.requestTweetsDifference()))
+      .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
     this.markerClusterOptions = {
       spiderfyOnMaxZoom: false,
       disableClusteringAtZoom: 8,
       chunkedLoading: true
     };
     this.canvas = canvas({padding: 0.5});
-
   }
 
   markerClusterReady(markerClusterGroup: MarkerClusterGroup) {
     this.clusterGroup = markerClusterGroup;
-
   }
 
   onAdd(map: Map): this {
     if (this.map === undefined) {
       this.map = map;
-      this.map.on('moveend', () => this.mapChangeHandler());
+      fromEvent(this.map, 'moveend').pipe(switchMap(() => this.requestTweetsDifference()))
+        .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
       this.currentMapBound = this.map.getBounds();
+      this.currentTimeRange = this.timeService.getRangeDate();
     }
-    this.currentZoomLevel = this.map.getZoom();
     this.isOn = true;
-    if (this.tweets.length === 0) {
-      const [start, end] = this.timeService.getRangeDate();
-      this.updateTweets(start, end);
-    } else {
-      this.clusterGroup.addLayers(this.tweets);
-    }
+    this.requestTweetsDifference(true).subscribe((tweets) => this.updateTweets(tweets));
     return this;
   }
 
@@ -90,16 +87,8 @@ export class FireTweetLayer extends LayerGroup {
 
 
   addTweetsToMap(tweets: Tweet[]) {
-    this.tweets = [];
     for (const tweet of tweets) {
-
-
-      this.tweets.push(new TweetMarker(tweet, {
-        radius: 2, color: '#e25822', fillColor: '#e25822',
-        renderer: this.canvas
-      }));
-
-
+      this.tweets.push(new TweetMarker(tweet, this.tweetMarkerStyleOption));
     }
     this.clusterGroup.addLayers(this.tweets);
   }
@@ -108,63 +97,57 @@ export class FireTweetLayer extends LayerGroup {
     return this.markerClusterOptions;
   }
 
-  timeRangeChangeHandler({start, end}) {
+  requestTweetsDifference(forceRefreshAll?: boolean): Observable<Tweet[]> {
     if (this.isOn) {
-      const now = new Date();
-      const diffInSecs = (now.getTime() - this.lastUpdateTime.getTime()) / 1000;
+      let newTimeRange = this.timeService.getRangeDate();
+      const newMapBound = this.map.getBounds();
 
-      if (diffInSecs > 1) {
-        this.updateTweets(start, end);
-        this.lastUpdateTime = now;
+      const timeUpdateNeeded = this.currentTimeRange[0] > newTimeRange[0] || this.currentTimeRange[1] < newTimeRange[1];
+      const boundUpdateNeeded = !this.currentMapBound.contains(newMapBound);
+
+      if (!forceRefreshAll && !boundUpdateNeeded && !timeUpdateNeeded) {
+        return of([]);
       }
+      if (timeUpdateNeeded) {
+        if (newTimeRange[0] < this.currentTimeRange[0]) {
+          newTimeRange = [newTimeRange[0], this.currentTimeRange[0]];
+        } else if (newTimeRange[1] > this.currentTimeRange[1]) {
+          newTimeRange = [this.currentTimeRange[1], newTimeRange[1]];
+        }
+      }
+
+      return this.tweetService.getFireTweetData(this.currentMapBound, newMapBound, newTimeRange);
     }
+    return of([]);
 
   }
 
-  mapChangeHandler() {
-    const newZoomLevel = this.map.getZoom();
-
-
-    if (newZoomLevel <= this.currentZoomLevel) {
-
-      if (this.isOn) {
-        const now = new Date();
-
-
-        const [start, end] = this.timeService.getRangeDate();
-        this.updateTweets(start, end);
-        this.lastUpdateTime = now;
-
-      }
-    }
-    this.currentZoomLevel = newZoomLevel;
-
-  }
-
-  updateTweets(start, end) {
-    const newMapBound = this.map.getBounds();
-    this.tweetService.getFireTweetData(this.currentMapBound, newMapBound, start, end).subscribe(tweets => {
-
-      this.addTweetsToMap(tweets);
-    });
+  updateTweets(tweets: Tweet[]) {
     this.removeTweetsFromMap();
-    this.currentMapBound = newMapBound;
-
+    this.currentTimeRange = this.timeService.getRangeDate();
+    const newMapBound = this.map.getBounds();
+    if (!this.currentMapBound.contains(newMapBound)) {
+      this.currentMapBound = this.map.getBounds();
+    }
+    this.addTweetsToMap(tweets);
   }
 
   private removeTweetsFromMap() {
     const removeLayers = [];
-    for (const layer of this.clusterGroup.getLayers()) {
-      if (!(layer instanceof TweetMarker && (this.map.getBounds().contains(layer.getLatLng())))) {
-        removeLayers.push(layer);
-      }
+    this.tweets = [];
+    this.clusterGroup.getLayers().forEach((layer: TweetMarker) => {
       const [start, end] = this.timeService.getRangeDate();
-      const tweetTime = layer['tweet'].createAt.getTime();
-      if (tweetTime < start || tweetTime > end) {
+      const tweetTime = layer.tweet.createAt.getTime();
+      if (!this.map.getBounds().contains(layer.getLatLng()) || (tweetTime < start || tweetTime > end)) {
         removeLayers.push(layer);
+      } else {
+        this.tweets.push(layer);
       }
-    }
+
+    });
+
     this.clusterGroup.removeLayers(removeLayers);
+
   }
 }
 

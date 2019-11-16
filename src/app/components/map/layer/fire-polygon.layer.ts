@@ -8,7 +8,7 @@ export class FirePolygonLayer extends LayerGroup {
 
   constructor(private timeService: TimeService, private fireService: FireService) {
     super();
-    this.timeService.timeRangeChangeEvent.subscribe(this.timeRangeChangeFirePolygonHandler);
+    this.timeService.timeRangeChange$.subscribe(this.timeRangeChangeFirePolygonHandler);
   }
 
   private polygons: GeoJSON[];

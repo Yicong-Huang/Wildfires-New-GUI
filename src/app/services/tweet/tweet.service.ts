@@ -23,13 +23,13 @@ export class TweetService {
     return this.http.get<TweetCount[]>(`${environment.API_BASE}/tweet/tweet-count`);
   }
 
-  getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, start, end): Observable<Tweet[]> {
+  getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, timeRange: number[]): Observable<Tweet[]> {
     return this.jsonService.deserialize(this.http.post<Tweet[]>(`${environment.API_BASE}/tweet/fire-tweet2`,
       JSON.stringify({
         oldBound,
         newBound,
-        startDate: start,
-        endDate: end,
+        startDate: timeRange[0],
+        endDate: timeRange[1],
       })
     ), Tweet);
   }
