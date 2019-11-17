@@ -6,12 +6,40 @@ import {FireService} from '../../../services/fire/fire.service';
 import {FireTweetLayer} from '../layer/fire-tweet.layer';
 import {TweetService} from '../../../services/tweet/tweet.service';
 
+
 @Component({
   selector: 'app-core-map',
   templateUrl: './core-map.component.html',
   styleUrls: ['./core-map.component.css']
 })
 export class CoreMapComponent implements OnInit {
+  layersControl = {
+    baseLayers: {
+      'Dark Map': tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
+        'Y4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 18,
+        id: 'mapbox.dark',
+        attribution: 'Dark'
+      }),
+      'Street Map': tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
+        'Y4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        attribution: 'Streets'
+      }),
+      'Satellite Map': tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
+        'Y4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 18,
+        id: 'mapbox.satellite',
+        attribution: 'Satellite'
+      })
+    },
+    overlays: {
+      'Fire Tweets': new FireTweetLayer(this.timeService, this.tweetService),
+      'Fire Polygon': new FirePolygonLayer(this.timeService, this.fireService)
+    }
+  };
+
   constructor(private timeService: TimeService, private fireService: FireService, private tweetService: TweetService) {
 
   }
@@ -51,36 +79,13 @@ export class CoreMapComponent implements OnInit {
 
   lat = this.center.lat;
   lng = this.center.lng;
-  layersControl = {
-    baseLayers: {
-      'Dark Map': tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
-        'Y4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-        maxZoom: 18,
-        id: 'mapbox.dark',
-        attribution: 'Dark'
-      }),
-      'Street Map': tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
-        'Y4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-        maxZoom: 18,
-        id: 'mapbox.streets',
-        attribution: 'Streets'
-      }),
-      'Satellite Map': tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpej' +
-        'Y4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-        maxZoom: 18,
-        id: 'mapbox.satellite',
-        attribution: 'Satellite'
-      })
-    },
-    overlays: {}
-  };
+  private tweetLayer: FireTweetLayer;
 
   ngOnInit() {
-    this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
-    this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer(this.timeService, this.tweetService);
+
+    this.tweetLayer = this.layersControl.overlays['Fire Tweets'];
 
   }
-
 
   // Output binding for center
   onCenterChange(center: LatLng) {

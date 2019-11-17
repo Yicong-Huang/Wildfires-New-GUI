@@ -16,14 +16,14 @@ export class FireService {
   }
 
   searchFirePolygon(id, size): Observable<object> {
-    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-with-id`, JSON.stringify({
+    return this.http.post(`${environment.API_BASE}/data/fire-with-id`, JSON.stringify({
       id,
       size
     }));
   }
 
   searchSeparatedFirePolygon(id, size): Observable<object> {
-    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-with-id-seperated`, JSON.stringify({
+    return this.http.post(`${environment.API_BASE}/data/fire-with-id-seperated`, JSON.stringify({
       id, size,
     })).pipe(map(data => {
       return {type: 'FeatureCollection', features: data};
@@ -32,7 +32,7 @@ export class FireService {
 
   getFirePolygonData(northEastBoundaries, southWestBoundaries, setSize, start, end): Observable<any> {
 
-    return this.http.post(`http://${environment.host}:${environment.port}/data/fire-polygon`, JSON.stringify({
+    return this.http.post(`${environment.API_BASE}/data/fire-polygon`, JSON.stringify({
       northEast: northEastBoundaries,
       southWest: southWestBoundaries,
       size: setSize,
@@ -43,4 +43,6 @@ export class FireService {
       return {type: 'FeatureCollection', features: data};
     }));
   }
+
+
 }
