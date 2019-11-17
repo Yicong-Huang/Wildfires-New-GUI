@@ -12,6 +12,11 @@ export class PopupBoxComponent implements OnInit {
   @Input() message = 'Default Pop-up Message.';
   @Input() zoomOutCenter;
   @Input() zoomOutLevel;
+  @Input() fireName;
+  @Input() fireStartTime;
+  @Input() fireEndTime;
+  @Input() fireArea;
+  @Input() fireAgency;
   private showDisplayButton = false;
   constructor(private fireService: FireService, private mapService: MapService) {
   }

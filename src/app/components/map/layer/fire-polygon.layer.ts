@@ -8,7 +8,6 @@ import {MapService} from '../../../services/map/map.service';
 export class FirePolygonLayer extends LayerGroup {
 
   private zoomOutLevel = 5;
-
   private polygons: GeoJSON[];
   private polygon: GeoJSON;
   private markers: Marker[] = [];
@@ -21,7 +20,6 @@ export class FirePolygonLayer extends LayerGroup {
     super();
     this.timeService.timeRangeChange.subscribe(this.timeRangeChangeFirePolygonHandler);
     this.fireService.getMultiplePolygonEvent.subscribe(this.getMultiplePolygon);
-
   }
 
   onAdd(map: Map): this {
@@ -66,6 +64,11 @@ export class FirePolygonLayer extends LayerGroup {
           const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
           popupEl.fireId = singlePoint.id;
           popupEl.message = `zoom in`;
+          popupEl.fireName = singlePoint.properties.name;
+          popupEl.fireStartTime = singlePoint.properties.starttime;
+          popupEl.fireEndTime = singlePoint.properties.endtime;
+          popupEl.fireArea = singlePoint.properties.area + ' acres';
+          popupEl.fireAgency = singlePoint.properties.agency;
           this.zoomOutCenter = this.map.getCenter();
           this.zoomOutLevel = this.map.getZoom();
           document.body.appendChild(popupEl);
@@ -93,28 +96,40 @@ export class FirePolygonLayer extends LayerGroup {
     layer.bindPopup(fl => {
       const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
       // Listen to the close event
-      popupEl.addEventListener('closed', () => document.body.removeChild(popupEl));
+      // popupEl.addEventListener('popupclose', () => {
+      //   console.log("popupclose");
+      //
+      // });
       popupEl.message = `zoom out`;
       popupEl.zoomOutCenter = this.zoomOutCenter;
       popupEl.zoomOutLevel = this.zoomOutLevel;
       popupEl.fireId = feature.id;
-      // Add to the DOM
-      document.body.appendChild(popupEl);
+      popupEl.fireName = feature.properties.name;
+      popupEl.fireStartTime = feature.properties.starttime;
+      popupEl.fireEndTime = feature.properties.endtime;
+      popupEl.fireArea = feature.properties.area + ' acres';
+      popupEl.fireAgency = feature.properties.agency;
       return popupEl;
-    });
+    }, {});
   };
 
+
   onEachFeature = (feature, layer) => {
-    console.log(feature);
-    console.log(layer);
     layer.on({
       mouseover: this.highlightFeature,
       mouseout: this.resetHighlight,
-      click: this.zoomToFeature
+      // click: this.zoomToFeature
     });
     this.bindPopupBox(feature, layer);
-    // controls the interaction between the mouse and the map
+    layer.on(
+      {
+        popupclose: () => {
+          console.log("popup");
+        }
+      });
   };
+
+
   highlightFeature = (event) => {
     // highlights the region when the mouse moves over the region
     const layer = event.target;
