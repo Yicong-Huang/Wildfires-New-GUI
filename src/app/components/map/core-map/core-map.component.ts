@@ -66,5 +66,5 @@ export class CoreMapComponent implements OnInit {
 
   zoomOutMap = ({center, layer}) => {
     this.map.setView(center, layer);
-  }
+  };
 }
