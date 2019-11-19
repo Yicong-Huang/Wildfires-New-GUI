@@ -96,7 +96,7 @@ export class FireTweetLayer extends LayerGroup {
         renderer: this.tweetMarkerStyleOption.renderer, atrribution: tweet.id
       };
 
-      this.tweets.push(new TweetMarker(tweet, this.tweetMarkerStyleOption));
+      this.tweets.push(new TweetMarker(tweet, signleTweetStyle));
     }
     this.clusterGroup.addLayers(this.tweets);
   }
