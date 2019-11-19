@@ -91,7 +91,8 @@ export class FireTweetLayer extends LayerGroup {
   addTweetsToMap(tweets: Tweet[]) {
     for (const tweet of tweets) {
       const signleTweetStyle = {
-        radius: this.tweetMarkerStyleOption.radius, color: this.tweetMarkerStyleOption.color, fillColor: this.tweetMarkerStyleOption.fillColor,
+        radius: this.tweetMarkerStyleOption.radius, color: this.tweetMarkerStyleOption.color,
+        fillColor: this.tweetMarkerStyleOption.fillColor,
         renderer: this.tweetMarkerStyleOption.renderer, atrribution: tweet.id
       };
 
