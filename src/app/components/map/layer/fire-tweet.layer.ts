@@ -13,7 +13,7 @@ import 'leaflet.markercluster';
 import {TimeService} from '../../../services/time/time.service';
 import {TweetService} from '../../../services/tweet/tweet.service';
 import {Tweet} from '../../../models/tweet.model';
-import {fromEvent, Observable, of} from 'rxjs';
+import {fromEvent, Observable, of, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 export class TweetMarker extends CircleMarker {
@@ -37,7 +37,6 @@ export class FireTweetLayer extends LayerGroup {
 
   private map;
   private tweets: TweetMarker[] = [];
-  private isOn = false;
   private currentMapBound: LatLngBounds;
   private currentTimeRange: number[];
 
@@ -48,12 +47,13 @@ export class FireTweetLayer extends LayerGroup {
     radius: 2, color: '#e25822', fillColor: '#e25822',
     renderer: this.canvas
   };
+  private timeRangeChangeSubscription: Subscription;
+  private mapChangeSubscription: Subscription;
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
 
-    this.timeService.timeRangeChange$.pipe(switchMap(() => this.requestTweetsDifference()))
-      .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
+
     this.markerClusterOptions = {
       spiderfyOnMaxZoom: false,
       disableClusteringAtZoom: 8,
@@ -69,19 +69,21 @@ export class FireTweetLayer extends LayerGroup {
   onAdd(map: Map): this {
     if (this.map === undefined) {
       this.map = map;
-      fromEvent(this.map, 'moveend').pipe(switchMap(() => this.requestTweetsDifference()))
-        .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
-      this.currentMapBound = this.map.getBounds();
-      this.currentTimeRange = this.timeService.getRangeDate();
     }
-    this.isOn = true;
+    this.currentMapBound = this.map.getBounds();
+    this.currentTimeRange = this.timeService.getRangeDate();
+    this.mapChangeSubscription = fromEvent(this.map, 'moveend').pipe(switchMap(() => this.requestTweetsDifference()))
+      .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
+    this.timeRangeChangeSubscription = this.timeService.timeRangeChange$.pipe(switchMap(() => this.requestTweetsDifference()))
+      .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
     this.requestTweetsDifference(true).subscribe((tweets) => this.updateTweets(tweets));
     return this;
   }
 
   onRemove(map: Map): this {
     this.clusterGroup.clearLayers();
-    this.isOn = false;
+    this.timeRangeChangeSubscription.unsubscribe();
+    this.mapChangeSubscription.unsubscribe();
     return this;
   }
 
@@ -98,28 +100,24 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   requestTweetsDifference(forceRefreshAll?: boolean): Observable<Tweet[]> {
-    if (this.isOn) {
-      let newTimeRange = this.timeService.getRangeDate();
-      const newMapBound = this.map.getBounds();
+    let newTimeRange = this.timeService.getRangeDate();
+    const newMapBound = this.map.getBounds();
 
-      const timeUpdateNeeded = this.currentTimeRange[0] > newTimeRange[0] || this.currentTimeRange[1] < newTimeRange[1];
-      const boundUpdateNeeded = !this.currentMapBound.contains(newMapBound);
+    const timeUpdateNeeded = this.currentTimeRange[0] > newTimeRange[0] || this.currentTimeRange[1] < newTimeRange[1];
+    const boundUpdateNeeded = !this.currentMapBound.contains(newMapBound);
 
-      if (!forceRefreshAll && !boundUpdateNeeded && !timeUpdateNeeded) {
-        return of([]);
-      }
-      if (timeUpdateNeeded) {
-        if (newTimeRange[0] < this.currentTimeRange[0]) {
-          newTimeRange = [newTimeRange[0], this.currentTimeRange[0]];
-        } else if (newTimeRange[1] > this.currentTimeRange[1]) {
-          newTimeRange = [this.currentTimeRange[1], newTimeRange[1]];
-        }
-      }
-
-      return this.tweetService.getFireTweetData(this.currentMapBound, newMapBound, newTimeRange);
+    if (!forceRefreshAll && !boundUpdateNeeded && !timeUpdateNeeded) {
+      return of([]);
     }
-    return of([]);
+    if (timeUpdateNeeded) {
+      if (newTimeRange[0] < this.currentTimeRange[0]) {
+        newTimeRange = [newTimeRange[0], this.currentTimeRange[0]];
+      } else if (newTimeRange[1] > this.currentTimeRange[1]) {
+        newTimeRange = [this.currentTimeRange[1], newTimeRange[1]];
+      }
+    }
 
+    return this.tweetService.getFireTweetData(this.currentMapBound, newMapBound, newTimeRange);
   }
 
   updateTweets(tweets: Tweet[]) {
