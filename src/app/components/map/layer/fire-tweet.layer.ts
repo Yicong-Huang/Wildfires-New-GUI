@@ -90,6 +90,11 @@ export class FireTweetLayer extends LayerGroup {
 
   addTweetsToMap(tweets: Tweet[]) {
     for (const tweet of tweets) {
+      const signleTweetStyle = {
+        radius: this.tweetMarkerStyleOption.radius, color: this.tweetMarkerStyleOption.color, fillColor: this.tweetMarkerStyleOption.fillColor,
+        renderer: this.tweetMarkerStyleOption.renderer, atrribution: tweet.id
+      };
+
       this.tweets.push(new TweetMarker(tweet, this.tweetMarkerStyleOption));
     }
     this.clusterGroup.addLayers(this.tweets);
@@ -147,5 +152,23 @@ export class FireTweetLayer extends LayerGroup {
     this.clusterGroup.removeLayers(removeLayers);
 
   }
+
+  addPopup(circle: CircleMarker, resp: any, error: boolean) {
+    if (!error) {
+      circle.bindPopup(resp.html).openPopup();
+    } else {
+      circle.bindPopup('This tweet has been deleted.').openPopup();
+    }
+  }
+
+  mouseOnMarker = (event) => {
+    const tweetId = event.target.options.attribution;
+    const url = 'https://api.twitter.com/1/statuses/oembed.json?id=' + tweetId;
+    this.tweetService.getEmbededTweet(url).subscribe(resp => this.addPopup(event.target, resp, false), error => {
+      this.addPopup(event.target, error, false);
+    });
+
+  };
+
 }
 

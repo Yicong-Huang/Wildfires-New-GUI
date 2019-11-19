@@ -23,6 +23,10 @@ export class TweetService {
     return this.http.get<TweetCount[]>(`${environment.API_BASE}/tweet/tweet-count`);
   }
 
+  getEmbededTweet(url): Observable<any> {
+    return this.http.jsonp(url, 'callback');
+  }
+
   getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, timeRange: number[]): Observable<Tweet[]> {
     return this.jsonService.deserialize(this.http.post<Tweet[]>(`${environment.API_BASE}/tweet/fire-tweet2`,
       JSON.stringify({

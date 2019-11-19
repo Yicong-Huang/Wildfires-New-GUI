@@ -6,7 +6,7 @@ import {AppComponent} from './app.component';
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {MapModule} from './components/map/map.module';
 import {TimeModule} from './components/time/time.module';
-import {HttpClientModule} from '@angular/common/http';
+import {HttpClientModule, HttpClientJsonpModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
