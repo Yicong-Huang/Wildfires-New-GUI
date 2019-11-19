@@ -16,6 +16,7 @@ import {HttpClientModule, HttpClientJsonpModule} from '@angular/common/http';
     MapModule,
     TimeModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     BrowserModule,
     LeafletModule.forRoot(),
   ],
