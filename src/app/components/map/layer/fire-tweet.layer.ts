@@ -136,12 +136,11 @@ export class FireTweetLayer extends LayerGroup {
     this.clusterGroup.getLayers().forEach((layer: TweetMarker) => {
       const [start, end] = this.timeService.getRangeDate();
       const tweetTime = layer.tweet.createAt.getTime();
-      if (!this.map.getBounds().contains(layer.getLatLng()) || (tweetTime < start || tweetTime > end)) {
+      if (!this.currentMapBound.contains(layer.getLatLng()) || (tweetTime < start || tweetTime > end)) {
         removeLayers.push(layer);
       } else {
         this.tweets.push(layer);
       }
-
     });
 
     this.clusterGroup.removeLayers(removeLayers);
