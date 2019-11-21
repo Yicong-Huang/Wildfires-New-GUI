@@ -152,20 +152,29 @@ export class FireTweetLayer extends LayerGroup {
 
   addPopup(circle: TweetMarker, resp: any, error: boolean) {
     if (!error) {
-      circle.bindPopup(resp.html).openPopup();
+      circle.bindPopup(this.popupContent(resp)).openPopup();
     } else {
-      circle.bindPopup('<p>This tweet has been deleted.</p>').openPopup();
+      circle.bindPopup('<blockquote><p>This tweet has been deleted</p></blockquote>').openPopup();
     }
   }
 
   mouseOnMarker = (event) => {
     const tweetId = event.target._tweet.id;
-    const url = 'https://api.twitter.com/1/statuses/oembed.json?id=' + tweetId;
-    this.tweetService.getEmbededTweet(url).subscribe(resp => this.addPopup(event.target, resp, false), error => {
+    this.tweetService.getSingleTweet(tweetId).subscribe(resp => this.addPopup(event.target, resp, false), error => {
       this.addPopup(event.target, error, false);
     });
 
   };
+
+  popupContent = (tweet: any) => {
+    let content = '<blockquote>';
+    content += '<p>' + tweet.text + '</p>';
+    if (tweet.image != null) {
+      content += '<img width="100%" src=' + tweet.image + '>';
+    }
+    content += '</blockquote>';
+    return content;
+  }
 
 }
 
