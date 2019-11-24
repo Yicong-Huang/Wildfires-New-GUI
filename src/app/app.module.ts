@@ -7,6 +7,7 @@ import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {MapModule} from './components/map/map.module';
 import {TimeModule} from './components/time/time.module';
 import {HttpClientModule} from '@angular/common/http';
+import {SearchModule} from './components/search/search.module';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import {HttpClientModule} from '@angular/common/http';
   imports: [
     MapModule,
     TimeModule,
+    SearchModule,
     HttpClientModule,
     BrowserModule,
     LeafletModule.forRoot(),

@@ -13,6 +13,7 @@
   "dependencies": {
     "@angular/animations": "^8.2.12",
     "@angular/common": "^8.2.12",
+    "@angular/cdk": "^8.2.3",
     "@angular/compiler": "^8.2.12",
     "@angular/core": "^8.2.12",
     "@angular/elements": "^8.2.12",
@@ -31,7 +32,8 @@
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",
     "upgrade": "^1.1.0",
-    "zone.js": "~0.9.1"
+    "zone.js": "~0.9.1",
+    "@angular/material": "latest"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.802.2",
