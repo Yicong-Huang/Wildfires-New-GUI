@@ -4,8 +4,7 @@ import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 
 import {environment} from '../../../environments/environment';
-import {TweetCount} from '../../models/tweet-count.model';
-import {Tweet} from '../../models/tweet.model';
+import {Tweet, TweetCount} from '../../models/tweet.model';
 
 import {JsonService} from '../json/json.service';
 import {LatLngBounds} from 'leaflet';
@@ -20,7 +19,8 @@ export class TweetService {
   }
 
   getTweetCountByDateData(): Observable<TweetCount[]> {
-    return this.http.get<TweetCount[]>(`${environment.API_BASE}/tweet/tweet-count`);
+    return this.jsonService.deserialize(
+      this.http.get<TweetCount[]>(`${environment.API_BASE}/tweet/tweet-count`), TweetCount);
   }
 
   getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, timeRange: number[]): Observable<Tweet[]> {

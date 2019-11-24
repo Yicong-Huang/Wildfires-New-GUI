@@ -13,7 +13,7 @@ import {TimeService} from '../../../services/time/time.service';
 
 import * as HighCharts from 'highcharts/highstock';
 import {TweetService} from '../../../services/tweet/tweet.service';
-import {TweetCount} from '../../../models/tweet-count.model';
+import {TweetCount} from '../../../models/tweet.model';
 
 @Component({
   selector: 'app-time-bar',
@@ -43,15 +43,16 @@ export class TimeBarComponent implements OnInit {
    * Count wildfire related tweets and draw it as a time bar chart to visualize.
    *
    */
-  drawTimeBar = (dateAndCount: TweetCount[]) => {
+  drawTimeBar = (tweetCounts: TweetCount[]) => {
     /** replace */
     /**
      *  Refine tweet data to count related to 'wildfire' in each DAY,
      *  storing in charData.
      */
-    const chartData = [];
-    Object.keys(dateAndCount).forEach(key => {
-      chartData.push([new Date(key).getTime(), dateAndCount[key]]);
+
+    const data = [];
+    tweetCounts.forEach(tweetCount => {
+      data.push([tweetCount.date.getTime(), tweetCount.count]);
     });
 
 
@@ -68,12 +69,10 @@ export class TimeBarComponent implements OnInit {
         margin: 2,
         height: 30,
       },
-      title: {
-        text: '',
-      },
       series: [{
+        name: 'fire tweets',
         type: 'line',
-        data: chartData,
+        data,
         color: '#e25822',
       }],
       tooltip: {
@@ -82,7 +81,7 @@ export class TimeBarComponent implements OnInit {
         padding: 0,
         hideDelay: 0,
         style: {
-          color: '#ffffff',
+          color: '#e25822',
         }
       },
       rangeSelector: {
@@ -120,7 +119,7 @@ export class TimeBarComponent implements OnInit {
       from: leftBandStart,
       to: rightBandEnd,
       color: 'rgba(216,128,64)',
-      id: 'plotBand'
+      id: 'plot-band'
     };
 
     if (!this.hasPlotBand) {
@@ -149,7 +148,7 @@ export class TimeBarComponent implements OnInit {
       this.currentTick = tick;
       this.timeService.setCurrentDate(dateSelectedInYMD);
     } else {
-      this.timeBar.xAxis[0].removePlotBand('plotBand');
+      this.timeBar.xAxis[0].removePlotBand('plot-band');
       if (this.currentTick !== undefined && this.currentTick.hasOwnProperty('label')) {
         this.currentTick.label.css({
           color: '#666666'
