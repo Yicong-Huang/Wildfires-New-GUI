@@ -4,6 +4,7 @@ import {FirePolygonLayer} from '../layer/fire-polygon.layer';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {FireTweetLayer} from '../layer/fire-tweet.layer';
+import {TempLayer} from '../layer/temperature.layer';
 import {TweetService} from '../../../services/tweet/tweet.service';
 
 @Component({
@@ -13,6 +14,7 @@ import {TweetService} from '../../../services/tweet/tweet.service';
 })
 export class CoreMapComponent implements OnInit {
   private tweetLayer: FireTweetLayer;
+  private temperatureLayer: TempLayer;
 
   constructor(private timeService: TimeService, private fireService: FireService, private tweetService: TweetService) {
 
@@ -50,6 +52,7 @@ export class CoreMapComponent implements OnInit {
   ngOnInit() {
     this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
     this.tweetLayer = this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer(this.timeService, this.tweetService);
+    this.temperatureLayer = this.layersControl.overlays['Temperature Heatmap'] = new TempLayer(this.fireService);
   }
 
   onMapReady(map: Map) {

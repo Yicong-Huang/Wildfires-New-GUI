@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 
 import {environment} from '../../../environments/environment';
+import {HeatMap} from '../../models/heat-map.model';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,10 @@ export class FireService {
 
       return {type: 'FeatureCollection', features: data};
     }));
+  }
+
+   getTemperatureData(): Observable<HeatMap[]> {
+        return this.http.get<HeatMap[]>(`http://${environment.host}:${environment.port}/data/recent-temp`);
   }
 
 
