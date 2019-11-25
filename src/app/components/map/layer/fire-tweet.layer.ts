@@ -49,6 +49,7 @@ export class FireTweetLayer extends LayerGroup {
   };
   private timeRangeChangeSubscription: Subscription;
   private mapChangeSubscription: Subscription;
+  private initialSubscription: Subscription;
 
   constructor(private timeService: TimeService, private tweetService: TweetService) {
     super();
@@ -72,16 +73,17 @@ export class FireTweetLayer extends LayerGroup {
     }
     this.currentMapBound = this.map.getBounds();
     this.currentTimeRange = this.timeService.getRangeDate();
+    this.initialSubscription = this.requestTweetsDifference(true).subscribe((tweets) => this.updateTweets(tweets));
     this.mapChangeSubscription = fromEvent(this.map, 'moveend').pipe(switchMap(() => this.requestTweetsDifference()))
       .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
     this.timeRangeChangeSubscription = this.timeService.timeRangeChange$.pipe(switchMap(() => this.requestTweetsDifference()))
       .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
-    this.requestTweetsDifference(true).subscribe((tweets) => this.updateTweets(tweets));
     return this;
   }
 
   onRemove(map: Map): this {
     this.clusterGroup.clearLayers();
+    this.initialSubscription.unsubscribe();
     this.timeRangeChangeSubscription.unsubscribe();
     this.mapChangeSubscription.unsubscribe();
     return this;
