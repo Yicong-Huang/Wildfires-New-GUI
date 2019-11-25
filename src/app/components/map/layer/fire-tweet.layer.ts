@@ -19,9 +19,11 @@ import {switchMap} from 'rxjs/operators';
 export class TweetMarker extends CircleMarker {
   private _tweet: Tweet;
 
-  constructor(tweet: Tweet, options?: CircleMarkerOptions) {
+  // noinspection JSAnnotator
+  constructor(tweet: Tweet, mouseOnMarker: (event: any) => void, options?: CircleMarkerOptions) {
     super(tweet.getLatLng(), options);
     this.tweet = tweet;
+    this.on('mouseover', mouseOnMarker);
   }
 
   get tweet() {
@@ -90,7 +92,7 @@ export class FireTweetLayer extends LayerGroup {
 
   addTweetsToMap(tweets: Tweet[]) {
     for (const tweet of tweets) {
-      this.tweets.push(new TweetMarker(tweet, this.tweetMarkerStyleOption));
+      this.tweets.push(new TweetMarker(tweet, this.mouseOnMarker, this.tweetMarkerStyleOption));
     }
     this.clusterGroup.addLayers(this.tweets);
   }
@@ -146,5 +148,44 @@ export class FireTweetLayer extends LayerGroup {
     this.clusterGroup.removeLayers(removeLayers);
 
   }
+
+  addPopup(circle: TweetMarker, resp: Tweet, error: boolean) {
+    if (!error) {
+      circle.bindPopup(this.popupContent(resp)).openPopup();
+    } else {
+      circle.bindPopup('<blockquote><p>This tweet has been deleted</p></blockquote>').openPopup();
+    }
+  }
+
+  mouseOnMarker = (event) => {
+    const tweetId = event.target._tweet.id;
+    this.tweetService.getSingleTweet(tweetId).subscribe(resp => this.addPopup(event.target, resp, false), error => {
+      this.addPopup(event.target, error, false);
+    });
+
+  };
+
+  popupContent = (tweet: Tweet) => {
+    let content = '<blockquote>';
+    if (tweet.image != null) {
+
+      if (typeof (tweet.image) === 'string') {
+        content += '<img width="100%" src=' + tweet.image + '>';
+      } else if (typeof (tweet.image) === 'object') {
+        tweet.image.forEach((url: string) => {
+          content += '<img width="100%" src=' + url + '>';
+        });
+      }
+    }
+    content += '<p>' + tweet.text + '</p>';
+    if (tweet.user === null) {
+      content += '<p> By anonym </p>';
+    } else {
+      content += '<p> By ' + tweet.user + '</p>';
+    }
+    content += '</blockquote>';
+    return content;
+  }
+
 }
 

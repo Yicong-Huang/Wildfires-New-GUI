@@ -34,6 +34,12 @@ export class Tweet {
     return this._createAt;
   }
 
+  text: string = null;
+
+  image: string[] = null;
+
+  user: string = null;
+
   public getLatLng(): LatLng {
     return new LatLng(this.lat, this.lng);
   }
