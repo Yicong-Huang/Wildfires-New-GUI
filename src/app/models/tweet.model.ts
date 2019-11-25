@@ -38,5 +38,23 @@ export class Tweet {
     return new LatLng(this.lat, this.lng);
   }
 
+}
+
+@JsonObject('TweetCount')
+export class TweetCount {
+  @JsonProperty('date', DateConverter)
+  private _date: Date = null;
+
+  get date(): Date {
+    return this._date;
+  }
+
+  @JsonProperty('count', Number)
+  private _count: number = null;
+
+  get count(): number {
+    return this._count;
+  }
+
 
 }
