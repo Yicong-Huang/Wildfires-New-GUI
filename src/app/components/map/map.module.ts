@@ -8,12 +8,14 @@ import {ClickMarkerComponent} from './click-marker/click-marker.component';
 import {FirePolygonLayer} from './layer/fire-polygon.layer';
 import {PopupBoxComponent} from './popup-box/popup-box.component';
 
+import {LeafletMarkerClusterModule} from '@asymmetrik/ngx-leaflet-markercluster';
 
 @NgModule({
   declarations: [CoreMapComponent, ClickMarkerComponent, PopupBoxComponent],
   imports: [
     CommonModule,
     LeafletModule,
+    LeafletMarkerClusterModule
   ],
   exports: [CoreMapComponent],
   providers: [FirePolygonLayer],

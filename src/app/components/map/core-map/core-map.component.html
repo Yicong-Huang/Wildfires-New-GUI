@@ -2,11 +2,14 @@
 <div class="map-wrapper">
 
   <div id="map" leaflet
-       (leafletCenterChange)="onCenterChange($event)" (leafletZoomChange)="onZoomChange($event)"
+       (leafletMapReady)="onMapReady($event)"
+       (leafletMarkerClusterReady)="tweetLayer.markerClusterReady($event)"
        [leafletCenter]="center"
        [leafletLayersControl]="layersControl"
        [leafletOptions]="options"
        [leafletZoom]="zoom"
-       (leafletMapReady)="onMapReady($event)"></div>
+       [leafletMarkerClusterOptions]="tweetLayer.getMarkerClusterOptions()"
+       [leafletMarkerCluster]="[]">
 
+  </div>
 </div>
