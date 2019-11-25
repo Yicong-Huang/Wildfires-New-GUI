@@ -1,35 +1,34 @@
 import {FireService} from '../../../services/fire/fire.service';
-import {LayerGroup, Map} from 'leaflet';
-import 'leaflet-maskcanvas';
+import {Layer, LayerGroup, Map} from 'leaflet';
 import 'leaflet-velocity-ts';
+import {Wind} from '../../../models/wind.model';
+
 declare let L;
 
 export class WindLayer extends LayerGroup {
-  private map;
-  private velocityLayer;
+  private layer: Layer;
 
   constructor(private fireService: FireService) {
-      super();
+    super();
   }
+
   onAdd(map: Map): this {
-    this.map = map;
-    this.fireService.getWindData().subscribe( data => this.windDataHandler(data));
+    this.fireService.getWindData().subscribe(data => this.windDataHandler(data, map));
     return this;
   }
 
   onRemove(map: Map): this {
-    if (this.velocityLayer) {
-      this.velocityLayer.remove();
+    if (this.layer !== undefined) {
+      this.layer.remove();
     }
     return this;
   }
 
-
-  windDataHandler = (wind) => {
+  windDataHandler = (wind: Wind, map: Map) => {
     // there's not much document about leaflet-velocity.
     // all we got is an example usage from
     // github.com/0nza1101/leaflet-velocity-ts
-    this.velocityLayer = L.velocityLayer({
+    this.layer = L.velocityLayer({
       displayValues: true,
       displayOptions: {
         position: 'bottomleft', // REQUIRED !
@@ -43,6 +42,6 @@ export class WindLayer extends LayerGroup {
       data: wind,
       maxVelocity: 12 // affect color and animation speed of wind
     });
-    this.velocityLayer.addTo(this.map);
-  }
+    this.layer.addTo(map);
+  };
 }

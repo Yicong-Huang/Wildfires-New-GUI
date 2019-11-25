@@ -31,8 +31,8 @@ export class FireService {
     }));
   }
 
-  getWindData(): Observable<Wind[]> {
-    return this.http.get<Wind[]>(`http://${environment.host}:${environment.port}/data/wind`);
+  getWindData(): Observable<Wind> {
+    return this.http.get<Wind>(`http://${environment.host}:${environment.port}/data/wind`);
   }
 
   getFirePolygonData(northEastBoundaries, southWestBoundaries, setSize, start, end): Observable<any> {
