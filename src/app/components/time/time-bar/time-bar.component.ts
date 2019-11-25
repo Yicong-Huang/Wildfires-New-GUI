@@ -55,7 +55,6 @@ export class TimeBarComponent implements OnInit {
       data.push([tweetCount.date.getTime(), tweetCount.count]);
     });
 
-
     this.timeBar = HighCharts.stockChart('timeBar-container', {
       chart: {
         height: 150,
@@ -89,7 +88,7 @@ export class TimeBarComponent implements OnInit {
       },
       xAxis: {
         type: 'datetime',
-        range: 6 * 30 * 24 * 3600 * 1000, // six months
+        range: this.timeService.getRangeDate().reduce((p, c) => c - p),
         events: {
           setExtremes: this.setExtremeHandler
         }
@@ -112,7 +111,6 @@ export class TimeBarComponent implements OnInit {
    *
    */
   clickHandler = (event) => {
-    // @ts-ignore
     const [leftBandStart, bandCenter, rightBandEnd, tick] = this.closestTickNearClick(event.xAxis[0]);
     const dateSelectedInYMD = new Date(bandCenter).toISOString().substring(0, 10);
     const plotBandOption = {
