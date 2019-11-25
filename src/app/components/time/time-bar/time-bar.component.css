@@ -6,7 +6,7 @@
   width: 60%;
 }
 
-#report {
+#time-range-label {
   z-index: 1001;
   position: absolute;
   bottom: 0;

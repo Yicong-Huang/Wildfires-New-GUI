@@ -34,6 +34,9 @@ export class TimeBarComponent implements OnInit {
   ngOnInit() {
     /** Subscribe tweet data related to wildfire in service. */
     this.tweetService.getTweetCountByDateData().subscribe(this.drawTimeBar);
+    const [start, end] = this.timeService.getRangeDate();
+    this.start = HighCharts.dateFormat('%Y-%m-%d', start);
+    this.end = HighCharts.dateFormat('%Y-%m-%d', end);
   }
 
   /**
