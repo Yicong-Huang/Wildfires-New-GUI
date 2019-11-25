@@ -1,0 +1,18 @@
+.custom-pin {
+  color: blue;
+}
+
+path {
+  fill: #e3e3e3;
+  stroke-width: 1px;
+  stroke: #666;
+}
+
+circle {
+  stroke: none;
+  fill: #fc0;
+}
+
+.added {
+  fill: #f0f;
+}

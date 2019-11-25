@@ -1,10 +1,23 @@
-import {GeoJSON, geoJSON, icon, LatLng, latLng, LayerGroup, Map, marker, Marker} from 'leaflet';
+import {
+  GeoJSON,
+  geoJSON,
+  icon,
+  LatLng,
+  latLng,
+  Layer,
+  LayerGroup,
+  LeafletMouseEvent,
+  Map,
+  marker,
+  Marker,
+  Point,
+} from 'leaflet';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {NgElement, WithProperties} from '@angular/elements';
-import {PopupBoxComponent} from '../popup-box/popup-box.component';
+import {FirePolygonPopupComponent} from '../fire-polygon-popup/fire-polygon-popup.component';
 import {MapService} from '../../../services/map/map.service';
-import {fromEvent, Observable, of} from 'rxjs';
+import {fromEvent, Observable, of, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 export class FirePolygonLayer extends LayerGroup {
@@ -12,16 +25,16 @@ export class FirePolygonLayer extends LayerGroup {
   private zoomOutLevel = 5;
   private polygon: GeoJSON;
   private markers: Marker[] = [];
-  private startDate;
-  private endDate;
+  private startDate: number;
+  private endDate: number;
   private map: Map;
   private zoomOutCenter: LatLng = new LatLng(33.64, -117.84);
   private isOn: boolean;
+  private timeRangeChangeSubscription: Subscription;
+  private mapChangeSubscription: Subscription;
 
   constructor(private timeService: TimeService, private fireService: FireService, private mapService: MapService) {
     super();
-    this.timeService.timeRangeChange$.pipe(switchMap((time) => this.timeRangeChangeFirePolygonHandler(time)))
-      .subscribe((event) => this.firePolygonDataHandler(event));
     this.fireService.getMultiplePolygonEvent.subscribe(this.getMultiplePolygon);
   }
 
@@ -29,7 +42,10 @@ export class FirePolygonLayer extends LayerGroup {
     this.isOn = true;
     if (this.map === undefined) {
       this.map = map;
-      fromEvent(this.map, 'zoomend, moveend').pipe(switchMap(() => this.getFirePolygonOnceMoved()))
+      this.mapChangeSubscription = fromEvent(this.map, 'zoomend, moveend').pipe(switchMap(
+        () => this.getFirePolygonOnceMoved())).subscribe((event) => this.firePolygonDataHandler(event));
+      this.timeRangeChangeSubscription = this.timeService.timeRangeChange$.pipe(
+        switchMap((time) => this.timeRangeChangeFirePolygonHandler(time)))
         .subscribe((event) => this.firePolygonDataHandler(event));
     }
     const [start, end] = this.timeService.getRangeDate();
@@ -40,6 +56,9 @@ export class FirePolygonLayer extends LayerGroup {
   }
 
   onRemove(map: Map): this {
+    this.timeRangeChangeSubscription.unsubscribe();
+    this.mapChangeSubscription.unsubscribe();
+    console.log(this.polygon);
     if (this.polygon !== undefined) {
       this.polygon.remove();
     }
@@ -60,6 +79,7 @@ export class FirePolygonLayer extends LayerGroup {
       if (this.map.getZoom() < 8) {
         const newMarkers: Marker[] = [];
         for (const singlePoint of data.features) {
+          singlePoint.type = 'Point';
           const latlng = latLng(singlePoint.geometry.coordinates[1], singlePoint.geometry.coordinates[0]);
           const size = this.map.getZoom() * this.map.getZoom();
           const fireIcon = icon({
@@ -67,7 +87,7 @@ export class FirePolygonLayer extends LayerGroup {
             iconSize: [size, size],
           });
           const singleMarker = marker(latlng, {icon: fireIcon}).bindPopup(fl => {
-            const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
+            const popupEl: NgElement & WithProperties<FirePolygonPopupComponent> = document.createElement('popup-element') as any;
             popupEl.fireId = singlePoint.id;
             popupEl.message = `zoom in`;
             popupEl.fireName = singlePoint.properties.name;
@@ -80,7 +100,6 @@ export class FirePolygonLayer extends LayerGroup {
             document.body.appendChild(popupEl);
             return popupEl;
           }).openPopup();
-
           newMarkers.push(singleMarker);
         }
         for (const m of this.markers) {
@@ -93,10 +112,10 @@ export class FirePolygonLayer extends LayerGroup {
 
         this.markers = newMarkers;
       } else {
-        data.type = 'Polygon';
         for (const m of this.markers) {
           this.map.removeLayer(m);
         }
+        console.log(data);
         this.polygon = geoJSON(data, {
           style: () => ({
             fillColor: 'yellow',
@@ -111,9 +130,9 @@ export class FirePolygonLayer extends LayerGroup {
     }
   };
 
-  bindPopupBox = (feature, layer) => {
+  bindPopupBox = (feature: GeoJSON.Feature, layer: Layer) => {
     layer.bindPopup(fl => {
-      const popupEl: NgElement & WithProperties<PopupBoxComponent> = document.createElement('popup-element') as any;
+      const popupEl: NgElement & WithProperties<FirePolygonPopupComponent> = document.createElement('popup-element') as any;
       popupEl.message = `zoom out`;
       popupEl.zoomOutCenter = this.zoomOutCenter;
       popupEl.zoomOutLevel = this.zoomOutLevel;
@@ -128,7 +147,7 @@ export class FirePolygonLayer extends LayerGroup {
   };
 
 
-  onEachFeature = (feature, layer) => {
+  onEachFeature = (feature: GeoJSON.Feature, layer: Layer) => {
     layer.on({
       mouseover: this.highlightFeature,
       mouseout: this.resetHighlight,
@@ -137,7 +156,7 @@ export class FirePolygonLayer extends LayerGroup {
   };
 
 
-  highlightFeature = (event) => {
+  highlightFeature = (event: LeafletMouseEvent) => {
     // highlights the region when the mouse moves over the region
     const layer = event.target;
     layer.setStyle({
@@ -148,7 +167,7 @@ export class FirePolygonLayer extends LayerGroup {
     });
 
   };
-  resetHighlight = (event) => {
+  resetHighlight = (event: LeafletMouseEvent) => {
     // gets rid of the highlight when the mouse moves out of the region
     this.polygon.resetStyle(event.target);
   };

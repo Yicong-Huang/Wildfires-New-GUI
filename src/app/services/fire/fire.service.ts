@@ -46,7 +46,6 @@ export class FireService {
   }
 
   getMultiplePolygon(id) {
-    console.log(id);
     this.getMultiplePolygonEvent.next(id);
     // this.searchSeparatedFirePolygon(id, 2).subscribe(this.getMultiplePolygonEvent);
   }

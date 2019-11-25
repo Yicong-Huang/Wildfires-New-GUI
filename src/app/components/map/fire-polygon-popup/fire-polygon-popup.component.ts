@@ -4,11 +4,11 @@ import {MapService} from '../../../services/map/map.service';
 
 @Component({
   selector: 'popup-box',
-  templateUrl: './popup-box.component.html',
-  styleUrls: ['./popup-box.component.css']
+  templateUrl: './fire-polygon-popup.component.html',
+  styleUrls: ['./fire-polygon-popup.component.css']
 })
-export class PopupBoxComponent implements OnInit {
-  @Input() fireId: string;
+export class FirePolygonPopupComponent implements OnInit {
+  @Input() fireId: string | number;
   @Input() message = 'Default Pop-up Message.';
   @Input() zoomOutCenter;
   @Input() zoomOutLevel;
@@ -54,5 +54,6 @@ export class PopupBoxComponent implements OnInit {
   displayMultiplePolygon() {
     this.fireService.getMultiplePolygon(this.fireId);
   }
+
 }
 
