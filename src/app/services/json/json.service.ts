@@ -15,7 +15,8 @@ export class JsonService {
     this.jsonConvert.valueCheckingMode = ValueCheckingMode.DISALLOW_NULL; // never allow null
   }
 
-  deserialize<T>(jsonObject: Observable<T[]>, classReference: new() => T): Observable<T[]> {
+
+  deserializeArray<T>(jsonObject: Observable<T[]>, classReference: new() => T): Observable<T[]> {
     return jsonObject.pipe(map((items: T[]) => items.map(item => this.jsonConvert.deserializeObject(item, classReference))));
   }
 }

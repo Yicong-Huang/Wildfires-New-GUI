@@ -1,19 +1,19 @@
-import {FireService} from '../../../services/fire/fire.service';
 import {Layer, LayerGroup, Map} from 'leaflet';
 import 'leaflet-velocity-ts';
 import {Wind} from '../../../models/wind.model';
+import {WindService} from '../../../services/environmental-data/wind.service';
 
 declare let L;
 
 export class WindLayer extends LayerGroup {
   private layer: Layer;
 
-  constructor(private fireService: FireService) {
+  constructor(private windService: WindService) {
     super();
   }
 
   onAdd(map: Map): this {
-    this.fireService.getWindData().subscribe(data => this.windDataHandler(data, map));
+    this.windService.getWindData().subscribe(data => this.windDataHandler(data, map));
     return this;
   }
 

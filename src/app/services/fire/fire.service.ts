@@ -5,7 +5,6 @@ import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 
 import {environment} from '../../../environments/environment';
-import {Wind} from '../../models/wind.model';
 
 @Injectable({
   providedIn: 'root'
@@ -29,10 +28,6 @@ export class FireService {
     })).pipe(map(data => {
       return {type: 'FeatureCollection', features: data};
     }));
-  }
-
-  getWindData(): Observable<Wind> {
-    return this.http.get<Wind>(`http://${environment.host}:${environment.port}/data/wind`);
   }
 
   getFirePolygonData(northEastBoundaries, southWestBoundaries, setSize, start, end): Observable<any> {

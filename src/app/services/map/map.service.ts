@@ -2,7 +2,6 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {map} from 'rxjs/operators';
-import {Wind} from '../../models/wind.model';
 import {HeatMap} from '../../models/heat-map.model';
 import {Boundary} from '../../models/boundary.model';
 import {SearchSuggestion} from '../../models/search-suggestion.model';
@@ -22,24 +21,6 @@ export class MapService {
   sendFireToFront = new EventEmitter();
 
   constructor(private http: HttpClient) {
-  }
-
-
-
-  getWildfirePredictionData(northEastBoundaries, southWestBoundaries, start, end): Observable<any> {
-    return this.http.post(`${environment.API_BASE}/wildfire-prediction`, JSON.stringify({
-      northEast: northEastBoundaries,
-      southWest: southWestBoundaries,
-      startDate: start,
-      endDate: end,
-    }));
-  }
-
-
-
-
-  getWindData(): Observable<Wind[]> {
-    return this.http.get<Wind[]>(`${environment.API_BASE}/data/wind`);
   }
 
   getBoundaryData(stateLevel, countyLevel, cityLevel, northEastBoundaries, southWestBoundaries): Observable<Boundary> {
@@ -62,12 +43,6 @@ export class MapService {
       {params: new HttpParams().set('userInput', userInput)});
   }
 
-
-  getRecentTweetData(): Observable<any> {
-
-    return this.http.get(`${environment.API_BASE}/tweet/recent-tweet`);
-  }
-
   getTemperatureData(): Observable<HeatMap[]> {
     return this.http.get<HeatMap[]>(`${environment.API_BASE}/data/recent-temp`);
   }
@@ -79,8 +54,4 @@ export class MapService {
     }));
   }
 
-  getIntentTweetData(id): Observable<any> {
-    return this.http.get(`${environment.API_BASE}/tweet/tweet-from-id`,
-      {params: new HttpParams().set('tweet_id', id)});
-  }
 }

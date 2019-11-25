@@ -19,12 +19,12 @@ export class TweetService {
   }
 
   getTweetCountByDateData(): Observable<TweetCount[]> {
-    return this.jsonService.deserialize(
+    return this.jsonService.deserializeArray(
       this.http.get<TweetCount[]>(`${environment.API_BASE}/tweet/tweet-count`), TweetCount);
   }
 
   getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, timeRange: number[]): Observable<Tweet[]> {
-    return this.jsonService.deserialize(this.http.post<Tweet[]>(`${environment.API_BASE}/tweet/fire-tweet2`,
+    return this.jsonService.deserializeArray(this.http.post<Tweet[]>(`${environment.API_BASE}/tweet/fire-tweet2`,
       JSON.stringify({
         oldBound,
         newBound,
