@@ -26,6 +26,7 @@
     "highcharts": "latest",
     "json2typescript": "^1.2.3",
     "leaflet": "^1.5.1",
+    "leaflet-velocity-ts": "^1.1.7",
     "leaflet.markercluster": "^1.4.1",
     "npm": "^6.12.1",
     "rxjs": "~6.4.0",
