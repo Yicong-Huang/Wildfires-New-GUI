@@ -150,7 +150,7 @@ export class FireTweetLayer extends LayerGroup {
 
   }
 
-  addPopup(circle: TweetMarker, resp: any, error: boolean) {
+  addPopup(circle: TweetMarker, resp: Tweet, error: boolean) {
     if (!error) {
       circle.bindPopup(this.popupContent(resp)).openPopup();
     } else {
@@ -166,11 +166,23 @@ export class FireTweetLayer extends LayerGroup {
 
   };
 
-  popupContent = (tweet: any) => {
+  popupContent = (tweet: Tweet) => {
     let content = '<blockquote>';
-    content += '<p>' + tweet.text + '</p>';
     if (tweet.image != null) {
-      content += '<img width="100%" src=' + tweet.image + '>';
+
+      if (typeof (tweet.image) === 'string') {
+        content += '<img width="100%" src=' + tweet.image + '>';
+      } else if (typeof (tweet.image) === 'object') {
+        tweet.image.forEach((url: string) => {
+          content += '<img width="100%" src=' + url + '>';
+        });
+      }
+    }
+    content += '<p>' + tweet.text + '</p>';
+    if (tweet.user === null) {
+      content += '<p> By anonym </p>';
+    } else {
+      content += '<p> By ' + tweet.user + '</p>';
     }
     content += '</blockquote>';
     return content;

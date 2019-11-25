@@ -23,8 +23,8 @@ export class TweetService {
     return this.http.get<TweetCount[]>(`${environment.API_BASE}/tweet/tweet-count`);
   }
 
-  getSingleTweet(id: string): Observable<any> {
-    return this.http.get(`${environment.API_BASE}/tweet/tweet-from-id?tweet_id=` + id);
+  getSingleTweet(id: string): Observable<Tweet> {
+    return this.http.get<Tweet>(`${environment.API_BASE}/tweet/tweet-from-id?tweet_id=` + id);
   }
 
   getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, timeRange: number[]): Observable<Tweet[]> {
