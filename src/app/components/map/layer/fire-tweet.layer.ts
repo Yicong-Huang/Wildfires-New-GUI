@@ -167,7 +167,7 @@ export class FireTweetLayer extends LayerGroup {
     const component = this.tweetCardComponentComponentFactory.create(this.injector);
     component.instance.id = resp.id;
     component.changeDetectorRef.detectChanges();
-    circle.bindPopup(component.location.nativeElement).openPopup();
+    circle.bindPopup(component.location.nativeElement, { minWidth: 300 }).openPopup();
   }
 
   mouseOnMarker = (event) => {
