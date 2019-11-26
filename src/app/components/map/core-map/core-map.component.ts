@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, Injector, OnInit} from '@angular/core';
 import {latLng, LatLng, Map, tileLayer} from 'leaflet';
 import {FirePolygonLayer} from '../layer/fire-polygon.layer';
 import {TimeService} from '../../../services/time/time.service';
@@ -35,12 +35,13 @@ export class CoreMapComponent implements OnInit {
       })
     },
     overlays: {
-      'Fire Tweets': new FireTweetLayer(this.timeService, this.tweetService),
+      'Fire Tweets': new FireTweetLayer(this.timeService, this.tweetService, this.resolver, this.injector),
       'Fire Polygon': new FirePolygonLayer(this.timeService, this.fireService)
     }
   };
 
-  constructor(private timeService: TimeService, private fireService: FireService, private tweetService: TweetService) {
+  constructor(private timeService: TimeService, private fireService: FireService, private tweetService: TweetService,
+              private resolver: ComponentFactoryResolver, private injector: Injector) {
 
   }
 

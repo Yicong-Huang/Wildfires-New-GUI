@@ -6,7 +6,7 @@ import {AppComponent} from './app.component';
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {MapModule} from './components/map/map.module';
 import {TimeModule} from './components/time/time.module';
-import {HttpClientModule, HttpClientJsonpModule} from '@angular/common/http';
+import {HttpClientJsonpModule, HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -20,7 +20,7 @@ import {HttpClientModule, HttpClientJsonpModule} from '@angular/common/http';
     BrowserModule,
     LeafletModule.forRoot(),
   ],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent]
 })
 export class AppModule {
 }

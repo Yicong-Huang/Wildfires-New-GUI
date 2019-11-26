@@ -6,6 +6,7 @@ import {
   LatLngBounds,
   LayerGroup,
   Map,
+  Marker,
   MarkerClusterGroup,
   MarkerClusterGroupOptions
 } from 'leaflet';
@@ -15,6 +16,8 @@ import {TweetService} from '../../../services/tweet/tweet.service';
 import {Tweet} from '../../../models/tweet.model';
 import {fromEvent, Observable, of, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
+import {ComponentFactory, ComponentFactoryResolver, ComponentRef, Injector} from '@angular/core';
+import {TweetCardComponent} from '../../tweet/tweet-card/tweet-card.component';
 
 export class TweetMarker extends CircleMarker {
   private _tweet: Tweet;
@@ -35,6 +38,13 @@ export class TweetMarker extends CircleMarker {
   }
 }
 
+interface MarkerMetaData {
+  name: string;
+  markerInstance: Marker;
+  componentInstance: ComponentRef<TweetCardComponent>;
+}
+
+
 export class FireTweetLayer extends LayerGroup {
 
   private map;
@@ -51,10 +61,11 @@ export class FireTweetLayer extends LayerGroup {
   };
   private timeRangeChangeSubscription: Subscription;
   private mapChangeSubscription: Subscription;
+  private tweetCardComponentComponentFactory: ComponentFactory<TweetCardComponent>;
 
-  constructor(private timeService: TimeService, private tweetService: TweetService) {
+  constructor(private timeService: TimeService, private tweetService: TweetService, private resolver: ComponentFactoryResolver,
+              private injector: Injector) {
     super();
-
 
     this.markerClusterOptions = {
       spiderfyOnMaxZoom: false,
@@ -62,6 +73,8 @@ export class FireTweetLayer extends LayerGroup {
       chunkedLoading: true
     };
     this.canvas = canvas({padding: 0.5});
+    this.tweetCardComponentComponentFactory = this.resolver.resolveComponentFactory(TweetCardComponent);
+
   }
 
   markerClusterReady(markerClusterGroup: MarkerClusterGroup) {
@@ -151,42 +164,17 @@ export class FireTweetLayer extends LayerGroup {
   }
 
   addPopup(circle: TweetMarker, resp: Tweet, error: boolean) {
-    if (!error) {
-      circle.bindPopup(this.popupContent(resp)).openPopup();
-    } else {
-      circle.bindPopup('<blockquote><p>This tweet has been deleted</p></blockquote>').openPopup();
-    }
+    const component = this.tweetCardComponentComponentFactory.create(this.injector);
+    component.instance.id = resp.id;
+    component.changeDetectorRef.detectChanges();
+    circle.bindPopup(component.location.nativeElement).openPopup();
   }
 
   mouseOnMarker = (event) => {
     const tweetId = event.target._tweet.id;
-    this.tweetService.getSingleTweet(tweetId).subscribe(resp => this.addPopup(event.target, resp, false), error => {
-      this.addPopup(event.target, error, false);
-    });
-
+    this.tweetService.getSingleTweet(tweetId).subscribe(resp => this.addPopup(event.target, resp, false));
   };
 
-  popupContent = (tweet: Tweet) => {
-    let content = '<blockquote>';
-    if (tweet.image != null) {
-
-      if (typeof (tweet.image) === 'string') {
-        content += '<img width="100%" src=' + tweet.image + '>';
-      } else if (typeof (tweet.image) === 'object') {
-        tweet.image.forEach((url: string) => {
-          content += '<img width="100%" src=' + url + '>';
-        });
-      }
-    }
-    content += '<p>' + tweet.text + '</p>';
-    if (tweet.user === null) {
-      content += '<p> By anonym </p>';
-    } else {
-      content += '<p> By ' + tweet.user + '</p>';
-    }
-    content += '</blockquote>';
-    return content;
-  }
 
 }
 
