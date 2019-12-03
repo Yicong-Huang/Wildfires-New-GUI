@@ -35,7 +35,12 @@ export class CoreMapComponent implements OnInit {
   private center = latLng([36.879966, -101.726909]);
   private layersControl = {
     baseLayers: this.layers,
-    overlays: {}
+    overlays: {
+       Highways: tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                })
+    }
   };
   private options: MapOptions = {
     preferCanvas: true,
