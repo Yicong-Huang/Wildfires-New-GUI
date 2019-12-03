@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 
 import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpClientJsonpModule} from '@angular/common/http';
 
 import {environment} from '../../../environments/environment';
 import {TweetCount} from '../../models/tweet-count.model';
@@ -25,6 +25,10 @@ export class TweetService {
 
   getSingleTweet(id: string): Observable<Tweet> {
     return this.http.get<Tweet>(`${environment.API_BASE}/tweet/tweet-from-id?tweet_id=` + id);
+  }
+
+  checkSingleTweetExist(id: string): Observable<any> {
+    return this.http.jsonp('https://api.twitter.com/1/statuses/oembed.json?id=' + id, 'callback');
   }
 
   getFireTweetData(oldBound: LatLngBounds, newBound: LatLngBounds, timeRange: number[]): Observable<Tweet[]> {

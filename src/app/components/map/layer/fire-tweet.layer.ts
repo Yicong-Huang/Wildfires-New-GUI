@@ -167,7 +167,13 @@ export class FireTweetLayer extends LayerGroup {
     const component = this.tweetCardComponentComponentFactory.create(this.injector);
     component.instance.id = resp.id;
     component.changeDetectorRef.detectChanges();
-    circle.bindPopup(component.location.nativeElement, { minWidth: 300 }).openPopup();
+    this.tweetService.checkSingleTweetExist(resp.id).subscribe(response => {
+      circle.bindPopup(component.location.nativeElement, { minWidth: 300 }).openPopup();
+    }, noTweetError => {
+      this.tweetService.getSingleTweet(resp.id).subscribe(response => {
+        circle.bindPopup('<blockquote>' + response.text + '</blockquote>', { minWidth: 300 }).openPopup();
+      });
+    });
     this.map.panTo(circle.getLatLng());
   }
 
