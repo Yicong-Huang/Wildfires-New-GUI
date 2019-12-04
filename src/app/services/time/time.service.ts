@@ -21,7 +21,7 @@ import {EventEmitter, Injectable} from '@angular/core';
  *
  */
 export class TimeService {
-  public timeRangeChange$ = new EventEmitter();
+  public timeRangeChangeEvent$ = new EventEmitter();
   private currentDateInYMD = undefined;
   private rangeStartDateInMS = new Date().getTime() - 30 * 24 * 3600 * 1000; // latest 1 month
   private rangeEndDateInMS = new Date().getTime();
@@ -44,7 +44,7 @@ export class TimeService {
   }
 
   sendTimeRange() {
-    this.timeRangeChange$.next({start: this.rangeStartDateInMS, end: this.rangeEndDateInMS});
+    this.timeRangeChangeEvent$.next({start: this.rangeStartDateInMS, end: this.rangeEndDateInMS});
   }
 }
 

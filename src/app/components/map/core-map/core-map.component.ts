@@ -1,12 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {latLng, Map, MapOptions, tileLayer} from 'leaflet';
-import {FirePolygonLayer} from '../layer/fire-polygon.layer';
+import {FirePolygonLayer} from '../layers/fire-polygon.layer';
+import {FireTweetLayer} from '../layers/fire-tweet.layer';
+import {TweetService} from '../../../services/tweet/tweet.service';
+import {WindLayer} from '../layers/wind.layer';
+import {WindService} from '../../../services/environmental-data/wind.service';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
-import {FireTweetLayer} from '../layer/fire-tweet.layer';
-import {TweetService} from '../../../services/tweet/tweet.service';
-import {WindLayer} from '../layer/wind.layer';
-import {WindService} from '../../../services/environmental-data/wind.service';
+import {MapService} from '../../../services/map/map.service';
+
 
 @Component({
   selector: 'app-core-map',
@@ -42,9 +44,10 @@ export class CoreMapComponent implements OnInit {
     layers: [this.layers.Dark]
   };
 
-  constructor(private timeService: TimeService, private fireService: FireService, private windService: WindService,
-              private tweetService: TweetService) {
-
+  constructor(private mapService: MapService, private timeService: TimeService, private windService: WindService,
+              private fireService: FireService, private tweetService: TweetService) {
+    this.mapService.zoomInPolygonEvent$.subscribe(this.zoomInToPolygon);
+    this.mapService.zoomOutPolygonEvent$.subscribe(this.zoomOutMap);
   }
 
   ngOnInit() {
@@ -57,5 +60,11 @@ export class CoreMapComponent implements OnInit {
     this.map = map;
   }
 
+  zoomInToPolygon = (zoomInBoundaries) => {
+    this.map.fitBounds(zoomInBoundaries);
+  };
 
+  zoomOutMap = ({center, layer}) => {
+    this.map.setView(center, layer);
+  };
 }

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
@@ -10,15 +10,14 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class FireService {
+  getMultiplePolygonEvent$ = new EventEmitter();
 
   constructor(private http: HttpClient) {
-
   }
 
   searchFirePolygon(id, size): Observable<object> {
     return this.http.post(`${environment.API_BASE}/data/fire-with-id`, JSON.stringify({
-      id,
-      size
+      id, size
     }));
   }
 
@@ -39,10 +38,16 @@ export class FireService {
       startDate: start,
       endDate: end,
     })).pipe(map(data => {
-
       return {type: 'FeatureCollection', features: data};
     }));
   }
 
+  getFireBoundingBox(id): Observable<object> {
+    return this.searchFirePolygon(id, 2);
+  }
 
+  getMultiplePolygon(id) {
+    this.getMultiplePolygonEvent$.next(id);
+    // this.searchSeparatedFirePolygon(id, 2).subscribe(this.getMultiplePolygonEvent);
+  }
 }

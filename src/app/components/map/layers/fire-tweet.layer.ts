@@ -74,7 +74,7 @@ export class FireTweetLayer extends LayerGroup {
     this.currentTimeRange = this.timeService.getRangeDate();
     this.mapChangeSubscription = fromEvent(this.map, 'moveend').pipe(switchMap(() => this.requestTweetsDifference()))
       .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
-    this.timeRangeChangeSubscription = this.timeService.timeRangeChange$.pipe(switchMap(() => this.requestTweetsDifference()))
+    this.timeRangeChangeSubscription = this.timeService.timeRangeChangeEvent$.pipe(switchMap(() => this.requestTweetsDifference()))
       .subscribe((tweets: Tweet[]) => this.updateTweets(tweets));
     this.requestTweetsDifference(true).subscribe((tweets) => this.updateTweets(tweets));
     return this;
