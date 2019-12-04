@@ -17,7 +17,7 @@ import {FireService} from '../../../services/fire/fire.service';
 import {NgElement, WithProperties} from '@angular/elements';
 import {FirePolygonPopupComponent} from '../fire-polygon-popup/fire-polygon-popup.component';
 import {MapService} from '../../../services/map/map.service';
-import {fromEvent, Observable, of, Subscription} from 'rxjs';
+import {fromEvent, Observable, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 export class FirePolygonLayer extends LayerGroup {
@@ -29,67 +29,73 @@ export class FirePolygonLayer extends LayerGroup {
   private endDate: number;
   private map: Map;
   private zoomOutCenter: LatLng = new LatLng(33.64, -117.84);
-  private isOn: boolean;
-  private timeRangeChangeSubscription: Subscription;
-  private mapChangeSubscription: Subscription;
+  private subscriptions: Subscription[] = [];
+  private customIconURL: string;
+  private prevFeature = new Set();
 
   constructor(private timeService: TimeService, private fireService: FireService, private mapService: MapService) {
     super();
-    this.fireService.getMultiplePolygonEvent.subscribe(this.getMultiplePolygon);
   }
 
   onAdd(map: Map): this {
-    this.isOn = true;
     if (this.map === undefined) {
       this.map = map;
-      this.mapChangeSubscription = fromEvent(this.map, 'zoomend, moveend').pipe(switchMap(
-        () => this.getFirePolygonOnceMoved())).subscribe((event) => this.firePolygonDataHandler(event));
-      this.timeRangeChangeSubscription = this.timeService.timeRangeChange$.pipe(
-        switchMap((time) => this.timeRangeChangeFirePolygonHandler(time)))
-        .subscribe((event) => this.firePolygonDataHandler(event));
     }
+    this.subscriptions.push(fromEvent(this.map, 'zoomend, moveend').pipe(switchMap(
+      () => this.getFirePolygonOnceMoved())).subscribe((event) => this.firePolygonDataHandler(event)));
+    this.subscriptions.push(this.timeService.timeRangeChange$.pipe(
+      switchMap((time) => this.timeRangeChangeFirePolygonHandler(time)))
+      .subscribe((event) => this.firePolygonDataHandler(event)));
+
     const [start, end] = this.timeService.getRangeDate();
     this.startDate = start;
     this.endDate = end;
-    this.getFirePolygonData().subscribe((event) => this.firePolygonDataHandler(event));
+    this.subscriptions.push(this.getFirePolygonData().subscribe((event) => this.firePolygonDataHandler(event)));
+    this.subscriptions.push(this.fireService.getMultiplePolygonEvent.subscribe(this.getMultiplePolygon));
     return this;
   }
 
   onRemove(map: Map): this {
-    this.timeRangeChangeSubscription.unsubscribe();
-    this.mapChangeSubscription.unsubscribe();
-    console.log(this.polygon);
+    for (const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
+    this.subscriptions = [];
     if (this.polygon !== undefined) {
       this.polygon.remove();
     }
-
     if (this.markers !== undefined) {
       this.markers.forEach((circle: Marker) => circle.remove());
     }
-    this.isOn = false;
     return this;
   }
 
   firePolygonDataHandler = (data) => {
     // adds the fire polygon to the map, the accuracy is based on the zoom level
-    if (this.isOn && data !== undefined) {
-      if (this.polygon) {
-        this.polygon.remove();
-      }
+    if (data !== undefined) {
       if (this.map.getZoom() < 8) {
+        if (this.polygon) {
+          this.polygon.remove();
+          this.prevFeature.clear();
+        }
         const newMarkers: Marker[] = [];
         for (const singlePoint of data.features) {
           singlePoint.type = 'Point';
           const latlng = latLng(singlePoint.geometry.coordinates[1], singlePoint.geometry.coordinates[0]);
           const size = this.map.getZoom() * this.map.getZoom();
+          const currentDate: Date = new Date();
+          const endTime: Date = new Date(singlePoint.properties.endtime);
+          const dateDifference: number = (currentDate.getTime() - endTime.getTime()) / (1000 * 24 * 3600);
+          this.customIconURL = `../../../../assets/image/fireIcon${dateDifference <= 31 ? 1 : 2}.png`;
+
           const fireIcon = icon({
-            iconUrl: 'assets/image/pixelfire.gif',
-            iconSize: [size, size],
+            iconUrl: this.customIconURL,
+            iconSize: [0.5 * size, 0.5 * size],
+            className: 'my-div-icon',
           });
           const singleMarker = marker(latlng, {icon: fireIcon}).bindPopup(fl => {
             const popupEl: NgElement & WithProperties<FirePolygonPopupComponent> = document.createElement('popup-element') as any;
             popupEl.fireId = singlePoint.id;
-            popupEl.message = `zoom in`;
+            popupEl.message = 'zoom in';
             popupEl.fireName = singlePoint.properties.name;
             popupEl.fireStartTime = singlePoint.properties.starttime;
             popupEl.fireEndTime = singlePoint.properties.endtime;
@@ -100,6 +106,16 @@ export class FirePolygonLayer extends LayerGroup {
             document.body.appendChild(popupEl);
             return popupEl;
           }).openPopup();
+          singleMarker.on('mouseover', (ev) => {
+            const iconBig = singleMarker.options.icon;
+            iconBig.options.iconSize = [size, size];
+            singleMarker.setIcon(iconBig);
+          });
+          singleMarker.on('mouseout', (ev) => {
+            const iconSmall = singleMarker.options.icon;
+            iconSmall.options.iconSize = [0.5 * size, 0.5 * size];
+            singleMarker.setIcon(iconSmall);
+          });
           newMarkers.push(singleMarker);
         }
         for (const m of this.markers) {
@@ -115,17 +131,33 @@ export class FirePolygonLayer extends LayerGroup {
         for (const m of this.markers) {
           this.map.removeLayer(m);
         }
-        console.log(data);
-        this.polygon = geoJSON(data, {
-          style: () => ({
-            fillColor: 'yellow',
-            weight: 2,
-            opacity: 0.8,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.5
-          }), onEachFeature: this.onEachFeature
-        }).addTo(this.map);
+        let polygonUpdate = false;
+        for (const feature of data.features) {
+          if (!this.prevFeature.has(feature.id)) {
+            polygonUpdate = true;
+            break;
+          } else {
+            this.prevFeature.delete(feature.id);
+          }
+        }
+        if (polygonUpdate) {
+          if (this.polygon) {
+            this.polygon.remove();
+          }
+          this.polygon = geoJSON(data, {
+            style: () => ({
+              fillColor: 'yellow',
+              weight: 2,
+              opacity: 0.8,
+              color: 'white',
+              dashArray: '3',
+              fillOpacity: 0.5
+            }), onEachFeature: this.onEachFeature
+          }).addTo(this.map);
+        }
+        for (const feature of data.features) {
+          this.prevFeature.add(feature.id);
+        }
       }
     }
   };
@@ -171,12 +203,10 @@ export class FirePolygonLayer extends LayerGroup {
     // gets rid of the highlight when the mouse moves out of the region
     this.polygon.resetStyle(event.target);
   };
-
-
   timeRangeChangeFirePolygonHandler = ({start, end}): Observable<any> => {
     this.startDate = start;
     this.endDate = end;
-    return (this.isOn) ? this.getFirePolygonData() : of(undefined);
+    return this.getFirePolygonData();
   };
 
   getMultiplePolygon = (id) => {
@@ -196,8 +226,7 @@ export class FirePolygonLayer extends LayerGroup {
   }
 
   getFirePolygonOnceMoved = (): Observable<any> => {
-    return (this.isOn && this.startDate && this.endDate) ? this.getFirePolygonData() : of(undefined);
+    return this.getFirePolygonData();
   };
-
 }
 
