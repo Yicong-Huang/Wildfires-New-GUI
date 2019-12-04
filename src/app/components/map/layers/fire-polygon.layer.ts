@@ -1,21 +1,8 @@
-import {
-  GeoJSON,
-  geoJSON,
-  icon,
-  LatLng,
-  latLng,
-  Layer,
-  LayerGroup,
-  LeafletMouseEvent,
-  Map,
-  marker,
-  Marker,
-  Point,
-} from 'leaflet';
+import {GeoJSON, geoJSON, icon, LatLng, latLng, Layer, LayerGroup, LeafletMouseEvent, Map, marker, Marker,} from 'leaflet';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {NgElement, WithProperties} from '@angular/elements';
-import {FirePolygonPopupComponent} from '../fire-polygon-popup/fire-polygon-popup.component';
+import {FirePolygonPopupComponent} from '../popups/fire-polygon-popup/fire-polygon-popup.component';
 import {MapService} from '../../../services/map/map.service';
 import {fromEvent, Observable, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';

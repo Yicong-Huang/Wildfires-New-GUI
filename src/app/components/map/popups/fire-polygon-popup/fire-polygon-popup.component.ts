@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {FireService} from '../../../services/fire/fire.service';
-import {MapService} from '../../../services/map/map.service';
+import {FireService} from '../../../../services/fire/fire.service';
+import {MapService} from '../../../../services/map/map.service';
 
 @Component({
   selector: 'popup-box',
@@ -18,6 +18,7 @@ export class FirePolygonPopupComponent implements OnInit {
   @Input() fireArea;
   @Input() fireAgency;
   private showDisplayButton = false;
+
   constructor(private fireService: FireService, private mapService: MapService) {
   }
 
@@ -49,7 +50,6 @@ export class FirePolygonPopupComponent implements OnInit {
       display: this.message === 'zoom out' ? 'block' : 'none'
     };
   };
-
 
   displayMultiplePolygon() {
     this.fireService.getMultiplePolygon(this.fireId);

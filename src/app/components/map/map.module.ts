@@ -5,8 +5,8 @@ import {CoreMapComponent} from './core-map/core-map.component';
 import {createCustomElement} from '@angular/elements';
 
 import {ClickMarkerComponent} from './click-marker/click-marker.component';
-import {FirePolygonLayer} from './layer/fire-polygon.layer';
-import {FirePolygonPopupComponent} from './fire-polygon-popup/fire-polygon-popup.component';
+import {FirePolygonLayer} from './layers/fire-polygon.layer';
+import {FirePolygonPopupComponent} from './popups/fire-polygon-popup/fire-polygon-popup.component';
 
 import {LeafletMarkerClusterModule} from '@asymmetrik/ngx-leaflet-markercluster';
 

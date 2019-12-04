@@ -1,24 +1,24 @@
-<button (click)="click()">{{ message }}</button>
+<button (click)="click()">{{message}}</button>
 <button (click)="displayMultiplePolygon()" [ngStyle]="currentStyles()">show fire for each day</button>
 <table style="width:100%">
   <tr>
-    <th>name</th>
+    <th>Fire Name</th>
     <td>{{fireName}}</td>
   </tr>
   <tr>
-    <th>fire-starttime</th>
+    <th>Start Time</th>
     <td>{{fireStartTime}}</td>
   </tr>
   <tr>
-    <th>fire-endtime</th>
+    <th>Contained Time</th>
     <td>{{fireEndTime}}</td>
   </tr>
   <tr>
-    <th>fire-area</th>
+    <th>Burned Area</th>
     <td>{{fireArea}}</td>
   </tr>
   <tr>
-    <th>fire-agency</th>
+    <th>Reported Agency</th>
     <td>{{fireAgency}}</td>
   </tr>
 </table>

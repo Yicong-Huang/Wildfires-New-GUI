@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {latLng, Map, MapOptions, tileLayer} from 'leaflet';
-import {FirePolygonLayer} from '../layer/fire-polygon.layer';
-import {FireTweetLayer} from '../layer/fire-tweet.layer';
+import {FirePolygonLayer} from '../layers/fire-polygon.layer';
+import {FireTweetLayer} from '../layers/fire-tweet.layer';
 import {TweetService} from '../../../services/tweet/tweet.service';
-import {WindLayer} from '../layer/wind.layer';
+import {WindLayer} from '../layers/wind.layer';
 import {WindService} from '../../../services/environmental-data/wind.service';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
