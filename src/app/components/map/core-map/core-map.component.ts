@@ -51,7 +51,7 @@ export class CoreMapComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService, this.mapService);
+    this.layersControl.overlays['Fire Polygon'] = new FirePolygonLayer(this.timeService, this.fireService);
     this.tweetLayer = this.layersControl.overlays['Fire Tweets'] = new FireTweetLayer(this.timeService, this.tweetService);
     this.layersControl.overlays['Global Wind'] = new WindLayer(this.windService);
   }

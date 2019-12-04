@@ -3,7 +3,6 @@ import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {NgElement, WithProperties} from '@angular/elements';
 import {FirePolygonPopupComponent} from '../popups/fire-polygon-popup/fire-polygon-popup.component';
-import {MapService} from '../../../services/map/map.service';
 import {fromEvent, Observable, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
@@ -20,7 +19,7 @@ export class FirePolygonLayer extends LayerGroup {
   private customIconURL: string;
   private prevFeature = new Set();
 
-  constructor(private timeService: TimeService, private fireService: FireService, private mapService: MapService) {
+  constructor(private timeService: TimeService, private fireService: FireService) {
     super();
   }
 
