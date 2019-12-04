@@ -19,8 +19,8 @@ export class MapService {
   markerRemove = new EventEmitter();
   searchNameLoaded = new EventEmitter();
   sendFireToFront = new EventEmitter();
-  zoomInPolygonEvent = new EventEmitter();
-  zoomOutPolygonEvent = new EventEmitter();
+  zoomInPolygonEvent$ = new EventEmitter();
+  zoomOutPolygonEvent$ = new EventEmitter();
 
   constructor(private http: HttpClient) {
   }
@@ -57,10 +57,10 @@ export class MapService {
   }
 
   zoomIn(firePolygonLL) {
-    this.zoomInPolygonEvent.next(firePolygonLL);
+    this.zoomInPolygonEvent$.next(firePolygonLL);
   }
 
   zoomOut(zoomOutCenter, zoomOutLevel) {
-    this.zoomOutPolygonEvent.next({center: zoomOutCenter, layer: zoomOutLevel});
+    this.zoomOutPolygonEvent$.next({center: zoomOutCenter, layer: zoomOutLevel});
   }
 }

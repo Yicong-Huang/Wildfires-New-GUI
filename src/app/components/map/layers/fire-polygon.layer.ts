@@ -29,7 +29,7 @@ export class FirePolygonLayer extends LayerGroup {
     }
     this.subscriptions.push(fromEvent(this.map, 'zoomend, moveend').pipe(switchMap(
       () => this.getFirePolygonOnceMoved())).subscribe((event) => this.firePolygonDataHandler(event)));
-    this.subscriptions.push(this.timeService.timeRangeChange$.pipe(
+    this.subscriptions.push(this.timeService.timeRangeChangeEvent$.pipe(
       switchMap((time) => this.timeRangeChangeFirePolygonHandler(time)))
       .subscribe((event) => this.firePolygonDataHandler(event)));
 
@@ -37,7 +37,7 @@ export class FirePolygonLayer extends LayerGroup {
     this.startDate = start;
     this.endDate = end;
     this.subscriptions.push(this.getFirePolygonData().subscribe((event) => this.firePolygonDataHandler(event)));
-    this.subscriptions.push(this.fireService.getMultiplePolygonEvent.subscribe(this.getMultiplePolygon));
+    this.subscriptions.push(this.fireService.getMultiplePolygonEvent$.subscribe(this.getMultiplePolygon));
     return this;
   }
 

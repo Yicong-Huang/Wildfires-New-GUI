@@ -10,13 +10,14 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class FireService {
-  getMultiplePolygonEvent = new EventEmitter();
+  getMultiplePolygonEvent$ = new EventEmitter();
+
   constructor(private http: HttpClient) {
   }
+
   searchFirePolygon(id, size): Observable<object> {
     return this.http.post(`${environment.API_BASE}/data/fire-with-id`, JSON.stringify({
-      id,
-      size
+      id, size
     }));
   }
 
@@ -46,7 +47,7 @@ export class FireService {
   }
 
   getMultiplePolygon(id) {
-    this.getMultiplePolygonEvent.next(id);
+    this.getMultiplePolygonEvent$.next(id);
     // this.searchSeparatedFirePolygon(id, 2).subscribe(this.getMultiplePolygonEvent);
   }
 }

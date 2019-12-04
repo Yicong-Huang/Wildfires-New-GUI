@@ -46,8 +46,8 @@ export class CoreMapComponent implements OnInit {
 
   constructor(private mapService: MapService, private timeService: TimeService, private windService: WindService,
               private fireService: FireService, private tweetService: TweetService) {
-    this.mapService.zoomInPolygonEvent.subscribe(this.zoomInToPolygon);
-    this.mapService.zoomOutPolygonEvent.subscribe(this.zoomOutMap);
+    this.mapService.zoomInPolygonEvent$.subscribe(this.zoomInToPolygon);
+    this.mapService.zoomOutPolygonEvent$.subscribe(this.zoomOutMap);
   }
 
   ngOnInit() {
