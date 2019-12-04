@@ -1,4 +1,16 @@
-import {GeoJSON, geoJSON, icon, LatLng, latLng, Layer, LayerGroup, LeafletMouseEvent, Map, marker, Marker,} from 'leaflet';
+import {
+  GeoJSON,
+  geoJSON,
+  icon,
+  LatLng,
+  latLng,
+  Layer,
+  LayerGroup,
+  LeafletMouseEvent,
+  Map,
+  marker,
+  Marker,
+} from 'leaflet';
 import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {NgElement, WithProperties} from '@angular/elements';
@@ -32,12 +44,12 @@ export class FirePolygonLayer extends LayerGroup {
     this.subscriptions.push(this.timeService.timeRangeChangeEvent$.pipe(
       switchMap((time) => this.timeRangeChangeFirePolygonHandler(time)))
       .subscribe((event) => this.firePolygonDataHandler(event)));
-
     const [start, end] = this.timeService.getRangeDate();
     this.startDate = start;
     this.endDate = end;
     this.subscriptions.push(this.getFirePolygonData().subscribe((event) => this.firePolygonDataHandler(event)));
     this.subscriptions.push(this.fireService.getMultiplePolygonEvent$.subscribe(this.getMultiplePolygon));
+    this.subscriptions.push(this.fireService.displayPolygonTransitionEvent.subscribe(this.displayPolygonTransition));
     return this;
   }
 
@@ -148,6 +160,30 @@ export class FirePolygonLayer extends LayerGroup {
     }
   };
 
+
+  displayPolygonTransition = (id) => {
+    console.log('displayPolygonTransition', id);
+    console.log(this.polygon);
+    this.fireService.searchSeparatedFirePolygon(id, 2).subscribe(this.polygonTransitionHandler);
+  };
+
+  polygonTransitionHandler = (data) => {
+    console.log(data);
+    if (data !== undefined) {
+      for (const singlePoint of data.features) {
+        console.log(singlePoint);
+      }
+    }
+  };
+  /*
+  this.polygon.eachLayer((layer: LayerGroup) => {
+    layer.getLayer(721);
+    // console.log(layerFeature.id);
+    // const id = layerFeature.id;
+  });
+  console.log(data);
+  */
+
   bindPopupBox = (feature: GeoJSON.Feature, layer: Layer) => {
     layer.bindPopup(fl => {
       const popupEl: NgElement & WithProperties<FirePolygonPopupComponent> = document.createElement('popup-element') as any;
@@ -183,7 +219,6 @@ export class FirePolygonLayer extends LayerGroup {
       dashArray: '',
       fillOpacity: 0.7
     });
-
   };
   resetHighlight = (event: LeafletMouseEvent) => {
     // gets rid of the highlight when the mouse moves out of the region

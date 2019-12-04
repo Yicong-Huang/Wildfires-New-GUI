@@ -55,5 +55,8 @@ export class FirePolygonPopupComponent implements OnInit {
     this.fireService.getMultiplePolygon(this.fireId);
   }
 
+  displayPolygonTransition() {
+    this.fireService.displayPolygonTransition(this.fireId);
+  }
 }
 

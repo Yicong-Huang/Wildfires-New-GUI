@@ -11,7 +11,7 @@ import {environment} from '../../../environments/environment';
 })
 export class FireService {
   getMultiplePolygonEvent$ = new EventEmitter();
-
+  displayPolygonTransitionEvent = new EventEmitter();
   constructor(private http: HttpClient) {
   }
 
@@ -49,5 +49,9 @@ export class FireService {
   getMultiplePolygon(id) {
     this.getMultiplePolygonEvent$.next(id);
     // this.searchSeparatedFirePolygon(id, 2).subscribe(this.getMultiplePolygonEvent);
+  }
+
+  displayPolygonTransition(id) {
+    this.displayPolygonTransitionEvent.next(id);
   }
 }
