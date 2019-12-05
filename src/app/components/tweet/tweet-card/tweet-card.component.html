@@ -1,4 +1,31 @@
 <div id="tweet-card-wrapper">
-    <ngx-tweet tweetId="{{id}}"></ngx-tweet>
+
+  <blockquote class="{{displayBlock}}">
+    <span> {{tweetText}}</span>
+
+    <span>
+     By  {{tweetUser}}
+    </span>
+  </blockquote>
+
+  <ngx-tweet tweetId="{{id}}"></ngx-tweet>
+    <table>
+      <tr>
+        <th>
+          Tweet_id
+        </th>
+        <th>
+          wildfire tweet confidence
+        </th>
+      <tr>
+      <tr>
+        <td>
+          {{id}}
+        </td>
+        <td>
+          {{cnnValue}}
+        </td>
+      </tr>
+    </table>
 </div>
 

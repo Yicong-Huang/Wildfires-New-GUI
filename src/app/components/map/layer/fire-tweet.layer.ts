@@ -51,7 +51,6 @@ export class FireTweetLayer extends LayerGroup {
   private tweets: TweetMarker[] = [];
   private currentMapBound: LatLngBounds;
   private currentTimeRange: number[];
-  private popupDelayId = null;
 
   private readonly markerClusterOptions: MarkerClusterGroupOptions;
   private readonly canvas: Canvas;
@@ -164,25 +163,46 @@ export class FireTweetLayer extends LayerGroup {
 
   }
 
-  addPopup(circle: TweetMarker, resp: Tweet, error: boolean) {
+  addPopup(circle: TweetMarker, tweetId: string, error: boolean) {
     const component = this.tweetCardComponentComponentFactory.create(this.injector);
-    component.instance.id = resp.id;
-    component.changeDetectorRef.detectChanges();
-    this.tweetService.checkSingleTweetExist(resp.id).subscribe(response => {
-      circle.bindPopup(component.location.nativeElement, { minWidth: 300 }).openPopup();
-    }, noTweetError => {
-      this.tweetService.getSingleTweet(resp.id).subscribe(response => {
-        circle.bindPopup('<blockquote>' + response.text + '</blockquote>', { minWidth: 300 }).openPopup();
+    if (!error) {
+      component.instance.id = tweetId;
+      component.instance.displayBlock = 'hide_block';
+      this.tweetService.getSingleTweet(tweetId).subscribe( resp => {
+        if (!resp.text_cnn_wildfire_prob) {
+          component.instance.cnnValue = 'Not Applicable';
+        } else {
+          component.instance.cnnValue = resp.text_cnn_wildfire_prob;
+        }
+        component.changeDetectorRef.detectChanges();
+        circle.bindPopup(component.location.nativeElement, { minWidth: 300 }).openPopup();
       });
-    });
+      component.changeDetectorRef.detectChanges();
+    } else {
+      this.tweetService.getSingleTweet(tweetId).subscribe(resp => {
+        component.instance.displayBlock = 'show_block';
+        component.instance.tweetText = resp.text;
+        component.instance.id = resp.id;
+        component.instance.tweetUser = resp.user;
+        if (!resp.text_cnn_wildfire_prob) {
+          component.instance.cnnValue = 'Not Applicable';
+        } else {
+          component.instance.cnnValue = resp.text_cnn_wildfire_prob;
+        }
+        component.changeDetectorRef.detectChanges();
+        circle.bindPopup(component.location.nativeElement, { minWidth: 300 }).openPopup();
+      });
+    }
+
   }
 
   clickOnMarker = (event) => {
     const tweetId = event.target._tweet.id;
-    if (this.popupDelayId) {
-      window.clearTimeout(this.popupDelayId);
-    }
-    this.tweetService.getSingleTweet(tweetId).subscribe(resp => this.addPopup(event.target, resp, false));
+    this.tweetService.checkSingleTweetExist(tweetId).subscribe(response => {
+      this.addPopup(event.target, tweetId, false);
+    }, error => {
+      this.addPopup(event.target, tweetId, true);
+    });
   };
 
 }

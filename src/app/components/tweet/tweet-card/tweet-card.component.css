@@ -1,0 +1,31 @@
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+th{
+  padding: 15px;
+  color: #2C3845;
+}
+
+td{
+  padding: 15px;
+  color: #2C3845;
+}
+
+tr{
+  border: 2px solid darkgray;
+}
+
+.hide_block{
+  display: none;
+}
+
+.show_block{
+  display: block;
+}
+
+

@@ -8,4 +8,8 @@ import {Component, Input} from '@angular/core';
 })
 export class TweetCardComponent {
   @Input() id;
+  @Input() cnnValue;
+  @Input() tweetText;
+  @Input() tweetUser;
+  @Input() displayBlock;
 }

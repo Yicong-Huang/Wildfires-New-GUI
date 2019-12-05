@@ -35,6 +35,7 @@ export class Tweet {
   }
 
   text: string = null;
+  text_cnn_wildfire_prob: number = null;
 
   image: string[] = null;
 
