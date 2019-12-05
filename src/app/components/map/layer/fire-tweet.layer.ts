@@ -23,10 +23,10 @@ export class TweetMarker extends CircleMarker {
   private _tweet: Tweet;
 
   // noinspection JSAnnotator
-  constructor(tweet: Tweet, mouseOnMarker: (event: any) => void, options?: CircleMarkerOptions) {
+  constructor(tweet: Tweet, clickOnMarker: (event: any) => void, options?: CircleMarkerOptions) {
     super(tweet.getLatLng(), options);
     this.tweet = tweet;
-    this.on('mouseover', mouseOnMarker);
+    this.on('click', clickOnMarker);
   }
 
   get tweet() {
@@ -51,6 +51,7 @@ export class FireTweetLayer extends LayerGroup {
   private tweets: TweetMarker[] = [];
   private currentMapBound: LatLngBounds;
   private currentTimeRange: number[];
+  private popupDelayId = null;
 
   private readonly markerClusterOptions: MarkerClusterGroupOptions;
   private readonly canvas: Canvas;
@@ -105,7 +106,7 @@ export class FireTweetLayer extends LayerGroup {
 
   addTweetsToMap(tweets: Tweet[]) {
     for (const tweet of tweets) {
-      this.tweets.push(new TweetMarker(tweet, this.mouseOnMarker, this.tweetMarkerStyleOption));
+      this.tweets.push(new TweetMarker(tweet, this.clickOnMarker, this.tweetMarkerStyleOption));
     }
     this.clusterGroup.addLayers(this.tweets);
   }
@@ -174,14 +175,15 @@ export class FireTweetLayer extends LayerGroup {
         circle.bindPopup('<blockquote>' + response.text + '</blockquote>', { minWidth: 300 }).openPopup();
       });
     });
-    this.map.panTo(circle.getLatLng());
   }
 
-  mouseOnMarker = (event) => {
+  clickOnMarker = (event) => {
     const tweetId = event.target._tweet.id;
+    if (this.popupDelayId) {
+      window.clearTimeout(this.popupDelayId);
+    }
     this.tweetService.getSingleTweet(tweetId).subscribe(resp => this.addPopup(event.target, resp, false));
   };
-
 
 }
 
