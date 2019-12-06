@@ -1,11 +1,14 @@
 <div id="tweet-card-wrapper">
 
   <blockquote class="{{displayBlock}}">
-    <span> {{tweetText}}</span>
-
-    <span>
-     By  {{tweetUser}}
-    </span>
+    <div class="block-wrapper">
+      <span class="text-block">
+        {{tweetText}}
+      </span>
+      <span class="user-block">
+        @{{tweetUser}}
+      </span>
+    </div>
   </blockquote>
 
   <ngx-tweet tweetId="{{id}}"></ngx-tweet>
