@@ -7,6 +7,7 @@ import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {MapModule} from './components/map/map.module';
 import {TimeModule} from './components/time/time.module';
 import {HttpClientModule} from '@angular/common/http';
+import {Ng5SliderModule} from 'ng5-slider';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import {HttpClientModule} from '@angular/common/http';
     TimeModule,
     HttpClientModule,
     BrowserModule,
+    Ng5SliderModule,
     LeafletModule.forRoot(),
   ],
   bootstrap: [AppComponent],

@@ -15,8 +15,10 @@ import {TimeService} from '../../../services/time/time.service';
 import {FireService} from '../../../services/fire/fire.service';
 import {NgElement, WithProperties} from '@angular/elements';
 import {FirePolygonPopupComponent} from '../popups/fire-polygon-popup/fire-polygon-popup.component';
+import {DateSliderComponent} from '../date-slider/date-slider.component';
 import {fromEvent, Observable, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
+import {Options} from 'ng5-slider';
 
 export class FirePolygonLayer extends LayerGroup {
 
@@ -30,7 +32,11 @@ export class FirePolygonLayer extends LayerGroup {
   private subscriptions: Subscription[] = [];
   private customIconURL: string;
   private prevFeature = new Set();
-
+  value = 100;
+  options: Options = {
+    floor: 0,
+    ceil: 200
+  };
   constructor(private timeService: TimeService, private fireService: FireService) {
     super();
   }
@@ -169,20 +175,17 @@ export class FirePolygonLayer extends LayerGroup {
 
   polygonTransitionHandler = (data) => {
     console.log(data);
+    const dates: Date[] = [];
     if (data !== undefined) {
       for (const singlePoint of data.features) {
-        console.log(singlePoint);
+        dates.push(new Date(singlePoint.properties.time));
       }
     }
+    const dateSlider: NgElement & WithProperties<DateSliderComponent> = document.createElement('dateslider-element') as any;
+    console.log(dates);
+    dateSlider.dates = dates;
+    document.body.appendChild(dateSlider);
   };
-  /*
-  this.polygon.eachLayer((layer: LayerGroup) => {
-    layer.getLayer(721);
-    // console.log(layerFeature.id);
-    // const id = layerFeature.id;
-  });
-  console.log(data);
-  */
 
   bindPopupBox = (feature: GeoJSON.Feature, layer: Layer) => {
     layer.bindPopup(fl => {
